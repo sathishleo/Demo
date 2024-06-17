@@ -1,0 +1,263 @@
+from django.db.models import Q
+from django.utils.timezone import now
+
+from usermodule.data.response.deviceresponse import device_response, Operator_response, ECAC_response
+from usermodule.models import Device, Operator, ECAC
+from utlis.dataservice.demo_list import Demo_List
+from utlis.dataservice.demo_paginator import DemoPaginator
+from utlis.dataservice.error import Error
+from utlis.dataservice.success import Success, SuccessMessage, SuccessStatus
+
+
+class deviceservice:
+
+
+    def create_device(self,request_obj):
+        if  request_obj.get_device_id() is  None:
+            device_obj=Device.objects.create(device_model=request_obj.get_device_model(),device_number=request_obj.get_device_number(),monitor_brand=request_obj.get_monitor_brand(),location=request_obj.get_location(),software_version=request_obj.get_software_version(),keyboard_brand=request_obj.get_keyboard_brand())
+        else:
+            device_obj=Device.objects.filter(device_id=request_obj.get_device_id()).update(device_model=request_obj.get_device_model(),device_number=request_obj.get_device_number(),monitor_brand=request_obj.get_monitor_brand(),location=request_obj.get_location(),software_version=request_obj.get_software_version(),keyboard_brand=request_obj.get_keyboard_brand(),updated_date=now())
+            device_obj = Device.objects.get(device_id=request_obj.get_device_id())
+        temp_response = device_response()
+        temp_response.set_device_id(device_obj.device_id)
+        temp_response.set_device_number(device_obj.device_number)
+        temp_response.set_device_model(device_obj.device_model)
+        temp_response.set_keyboard_brand(device_obj.keyboard_brand)
+        temp_response.set_location(device_obj.location)
+        temp_response.set_monitor_brand(device_obj.monitor_brand)
+        temp_response.set_software_version(device_obj.software_version)
+        return temp_response
+
+    def fetch_device(self,vys_page, device_model):
+        try:
+            condition=Q(status=1)
+            if device_model!=" " and device_model!=None:
+                condition&=Q(device_model=device_model)
+            obj = Device.objects.filter(condition)[
+                 vys_page.get_offset():vys_page.get_query_limit()]
+
+            list_length = len(obj)
+            pro_list = Demo_List()
+            if list_length <= 0:
+                return pro_list
+            else:
+
+                for i in obj:
+                    temp_response = device_response()
+                    temp_response.set_device_id(i.device_id)
+                    temp_response.set_device_number(i.device_number)
+                    temp_response.set_device_model(i.device_model)
+                    temp_response.set_keyboard_brand(i.keyboard_brand)
+                    temp_response.set_location(i.location)
+                    temp_response.set_monitor_brand(i.monitor_brand)
+                    temp_response.set_software_version(i.software_version)
+                    pro_list.append(temp_response)
+                vpage = DemoPaginator(obj, vys_page.get_index(), 5)
+                pro_list.set_pagination(vpage)
+                return pro_list
+        except Exception as e:
+            error_obj = Error()
+            print(e)
+            error_obj.set_description(str(e))
+            return error_obj
+    def device_get(self,device_id):
+        id_obj=Device.objects.get(device_id=device_id)
+        temp_response = device_response()
+        temp_response.set_device_id(id_obj.device_id)
+        temp_response.set_device_number(id_obj.device_number)
+        temp_response.set_device_model(id_obj.device_model)
+        temp_response.set_keyboard_brand(id_obj.keyboard_brand)
+        temp_response.set_location(id_obj.location)
+        temp_response.set_monitor_brand(id_obj.monitor_brand)
+        temp_response.set_software_version(id_obj.software_version)
+        return temp_response
+
+
+    def modification_device(self,device_id,status):
+        # Status=obj_status()
+        modification_obj=Device.objects.filter(device_id=int(device_id)).update(status=status)
+        if modification_obj==0:
+            response = Error()
+            response.set_code("ID NOT MATCHED")
+            # response.set_name("Username already existed")
+            return response
+        else:
+            success_obj=Success()
+            success_obj.set_message(SuccessMessage.DELETE_MESSAGE)
+            success_obj.set_status(SuccessStatus.SUCCESS)
+            return success_obj
+
+
+class Operator_service:
+
+    def create_operator(self, request_obj):
+        if request_obj.get_operator_id() is  None:
+            operator_obj = Operator.objects.create(first_name=request_obj.get_first_name(),last_name=request_obj.get_last_name(),company=request_obj.get_company(),employee_id=request_obj.get_employee_id(),email_address=request_obj.get_email_address(),phone=request_obj.get_phone())
+        else:
+            operator_obj = Operator.objects.filter(operator_id=request_obj.get_operator_id()).update(first_name=request_obj.get_first_name(),last_name=request_obj.get_last_name(),company=request_obj.get_company(),employee_id=request_obj.get_employee_id(),email_address=request_obj.get_email_address(),phone=request_obj.get_phone(),updated_date=now())
+            operator_obj = Operator.objects.get(operator_id=request_obj.get_operator_id())
+        temp_response = Operator_response()
+        temp_response.set_operator_id(operator_obj.operator_id)
+        temp_response.set_first_name(operator_obj.first_name)
+        temp_response.set_last_name(operator_obj.last_name)
+        temp_response.set_company(operator_obj.company)
+        temp_response.set_employee_id(operator_obj.employee_id)
+        temp_response.set_email_address(operator_obj.email_address)
+        temp_response.set_phone(operator_obj.phone)
+        return temp_response
+    def fetch_operator(self, vys_page, first_name):
+        try:
+            condition = Q(status=1)
+            if first_name != " " and first_name != None:
+                condition &= Q(first_name=first_name)
+            obj = Operator.objects.filter(condition)[
+                  vys_page.get_offset():vys_page.get_query_limit()]
+
+            list_length = len(obj)
+            pro_list = Demo_List()
+            if list_length <= 0:
+                return pro_list
+            else:
+
+                for i in obj:
+                    temp_response = Operator_response()
+                    temp_response.set_operator_id(i.operator_id)
+                    temp_response.set_first_name(i.first_name)
+                    temp_response.set_last_name(i.last_name)
+                    temp_response.set_company(i.company)
+                    temp_response.set_employee_id(i.employee_id)
+                    temp_response.set_email_address(i.email_address)
+                    temp_response.set_phone(i.phone)
+
+                    pro_list.append(temp_response)
+                vpage = DemoPaginator(obj, vys_page.get_index(), 5)
+                pro_list.set_pagination(vpage)
+                return pro_list
+        except Exception as e:
+            error_obj = Error()
+            print(e)
+            # error_obj.set_code(ErrorMessage.INVALID_DATA)
+            error_obj.set_description(str(e))
+            return error_obj
+
+    def operator_get(self, operator_id):
+        id_obj = Operator.objects.get(operator_id=operator_id)
+        temp_response = Operator_response()
+        temp_response.set_operator_id(id_obj.operator_id)
+        temp_response.set_first_name(id_obj.first_name)
+        temp_response.set_last_name(id_obj.last_name)
+        temp_response.set_company(id_obj.company)
+        temp_response.set_employee_id(id_obj.employee_id)
+        temp_response.set_email_address(id_obj.email_address)
+        temp_response.set_phone(id_obj.phone)
+        return temp_response
+
+    def modification_operator(self,operator_id,status):
+        modification_obj = Operator.objects.filter(operator_id=operator_id).update(status=status)
+        if modification_obj == 0:
+            response = Error()
+            response.set_code("ID NOT MATCHED")
+            # response.set_name("Username already existed")
+            return response
+        else:
+            success_obj = Success()
+            success_obj.set_message(SuccessMessage.DELETE_MESSAGE)
+            success_obj.set_status(SuccessStatus.SUCCESS)
+            return success_obj
+
+
+class ECAC_service:
+
+    def create_ecac(self, request_obj):
+        if request_obj.get_ecac_id() is  None:
+            ecac_obj = ECAC.objects.create(test_view=request_obj.get_test_view(),test_date=request_obj.get_test_date(),test_time=request_obj.get_test_time(),device_id=request_obj.get_device_id(),operator_id=request_obj.get_operator_id(),position=request_obj.get_position(),test_1test_2=request_obj.get_test1_test2(),test_3=request_obj.get_test3(),test_4a=request_obj.get_test4a(),test_4b=request_obj.get_test4b(),test_5=request_obj.get_test5())
+        else:
+            ecac_obj = ECAC.objects.filter(ecac_id=request_obj.get_ecac_id()).update(test_view=request_obj.get_test_view(),test_date=request_obj.get_test_date(),test_time=request_obj.get_test_time(),device_id=request_obj.get_device_id(),operator_id=request_obj.get_operator_id(),position=request_obj.get_position(),test_1test_2=request_obj.get_test1_test2(),test_3=request_obj.get_test3(),test_4a=request_obj.get_test4a(),test_4b=request_obj.get_test4b(),test_5=request_obj.get_test5(),updated_date=now())
+            ecac_obj = ECAC.objects.get(ecac_id=request_obj.get_ecac_id())
+        temp_response = ECAC_response()
+        temp_response.set_operator_id(ecac_obj.operator_id)
+        temp_response.set_device_id(ecac_obj.device_id)
+        temp_response.set_ecac_id(ecac_obj.ecac_id)
+        temp_response.set_position(ecac_obj.position)
+        temp_response.set_test_date(str(ecac_obj.test_date))
+        temp_response.set_test_time(str(ecac_obj.test_time))
+        temp_response.set_test_view(ecac_obj.test_view)
+        temp_response.set_test1_test2(ecac_obj.test_1test_2)
+        temp_response.set_test3(ecac_obj.test_3)
+        temp_response.set_test4a(ecac_obj.test_4a)
+        temp_response.set_test4b(ecac_obj.test_4b)
+        temp_response.set_test_5(ecac_obj.test_5)
+        return temp_response
+
+    def fetch_ecac(self, vys_page, test_view):
+        try:
+            condition = Q(status=1)
+            if test_view != " " and test_view != None:
+                condition &= Q(test_view=test_view)
+            obj = ECAC.objects.filter(condition)[
+                  vys_page.get_offset():vys_page.get_query_limit()]
+
+            list_length = len(obj)
+            pro_list = Demo_List()
+            if list_length <= 0:
+                return pro_list
+            else:
+
+                for i in obj:
+                    temp_response = ECAC_response()
+                    temp_response.set_operator_id(i.operator_id)
+                    temp_response.set_device_id(i.device_id)
+                    temp_response.set_ecac_id(i.ecac_id)
+                    temp_response.set_position(i.position)
+                    temp_response.set_test_date(str(i.test_date))
+                    temp_response.set_test_time(str(i.test_time))
+                    temp_response.set_test_view(i.test_view)
+                    temp_response.set_test1_test2(i.test_1test_2)
+                    temp_response.set_test3(i.test_3)
+                    temp_response.set_test4a(i.test_4a)
+                    temp_response.set_test4b(i.test_4b)
+                    temp_response.set_test_5(i.test_5)
+
+
+                    pro_list.append(temp_response)
+                vpage = DemoPaginator(obj, vys_page.get_index(), 5)
+                pro_list.set_pagination(vpage)
+                return pro_list
+        except Exception as e:
+            error_obj = Error()
+            print(e)
+            # error_obj.set_code(ErrorMessage.INVALID_DATA)
+            error_obj.set_description(str(e))
+            return error_obj
+
+    def ecac_get(self, ecac_id):
+        id_obj = ECAC.objects.get(ecac_id=ecac_id)
+        temp_response = ECAC_response()
+        temp_response.set_operator_id(id_obj.operator_id)
+        temp_response.set_device_id(id_obj.device_id)
+        temp_response.set_ecac_id(id_obj.ecac_id)
+        temp_response.set_position(id_obj.position)
+        temp_response.set_test_date(str(id_obj.test_date))
+        temp_response.set_test_time(str(id_obj.test_time))
+        temp_response.set_test_view(id_obj.test_view)
+        temp_response.set_test1_test2(id_obj.test_1test_2)
+        temp_response.set_test3(id_obj.test_3)
+        temp_response.set_test4a(id_obj.test_4a)
+        temp_response.set_test4b(id_obj.test_4b)
+        temp_response.set_test_5(id_obj.test_5)
+        return temp_response
+    def modification_ecac(self, ecac_id,status):
+        modification_obj = ECAC.objects.filter(ecac_id=ecac_id).update(status=status)
+
+        if modification_obj == 0:
+            response = Error()
+            response.set_code("ID NOT MATCHED")
+            # response.set_name("Username already existed")
+            return response
+        else:
+            success_obj = Success()
+            success_obj.set_message(SuccessMessage.DELETE_MESSAGE)
+            success_obj.set_status(SuccessStatus.SUCCESS)
+            return success_obj
+
+
