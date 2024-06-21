@@ -14,18 +14,20 @@ class deviceservice:
 
     def create_device(self,request_obj):
         if  request_obj.get_device_id() is  None:
-            device_obj=Device.objects.create(device_model=request_obj.get_device_model(),device_number=request_obj.get_device_number(),monitor_brand=request_obj.get_monitor_brand(),location=request_obj.get_location(),software_version=request_obj.get_software_version(),keyboard_brand=request_obj.get_keyboard_brand())
+            device_obj=Device.objects.create(device_model=request_obj.get_device_model(),device_number=request_obj.get_device_number(),monitor_brand=request_obj.get_monitor_brand(),location=request_obj.get_location(),software_version=request_obj.get_software_version(),keyboard_brand=request_obj.get_keyboard_brand(),tunnel_size=request_obj.get_tunnel_size())
         else:
-            device_obj=Device.objects.filter(device_id=request_obj.get_device_id()).update(device_model=request_obj.get_device_model(),device_number=request_obj.get_device_number(),monitor_brand=request_obj.get_monitor_brand(),location=request_obj.get_location(),software_version=request_obj.get_software_version(),keyboard_brand=request_obj.get_keyboard_brand(),updated_date=now())
+            device_obj=Device.objects.filter(device_id=request_obj.get_device_id()).update(device_model=request_obj.get_device_model(),tunnel_size=request_obj.get_tunnel_size(),device_number=request_obj.get_device_number(),monitor_brand=request_obj.get_monitor_brand(),location=request_obj.get_location(),software_version=request_obj.get_software_version(),keyboard_brand=request_obj.get_keyboard_brand(),updated_date=now())
             device_obj = Device.objects.get(device_id=request_obj.get_device_id())
         temp_response = device_response()
         temp_response.set_device_id(device_obj.device_id)
         temp_response.set_device_number(device_obj.device_number)
         temp_response.set_device_model(device_obj.device_model)
+        temp_response.set_tunnel_size(device_obj.tunnel_size)
         temp_response.set_keyboard_brand(device_obj.keyboard_brand)
         temp_response.set_location(device_obj.location)
         temp_response.set_monitor_brand(device_obj.monitor_brand)
         temp_response.set_software_version(device_obj.software_version)
+        temp_response.set_status(device_obj.status)
         return temp_response
 
     def fetch_device(self,vys_page, device_model):
@@ -46,11 +48,13 @@ class deviceservice:
                     temp_response = device_response()
                     temp_response.set_device_id(i.device_id)
                     temp_response.set_device_number(i.device_number)
+                    temp_response.set_tunnel_size(i.tunnel_size)
                     temp_response.set_device_model(i.device_model)
                     temp_response.set_keyboard_brand(i.keyboard_brand)
                     temp_response.set_location(i.location)
                     temp_response.set_monitor_brand(i.monitor_brand)
                     temp_response.set_software_version(i.software_version)
+                    temp_response.set_status(i.status)
                     pro_list.append(temp_response)
                 vpage = DemoPaginator(obj, vys_page.get_index(), 5)
                 pro_list.set_pagination(vpage)
@@ -65,11 +69,13 @@ class deviceservice:
         temp_response = device_response()
         temp_response.set_device_id(id_obj.device_id)
         temp_response.set_device_number(id_obj.device_number)
+        temp_response.set_tunnel_size(id_obj.tunnel_size)
         temp_response.set_device_model(id_obj.device_model)
         temp_response.set_keyboard_brand(id_obj.keyboard_brand)
         temp_response.set_location(id_obj.location)
         temp_response.set_monitor_brand(id_obj.monitor_brand)
         temp_response.set_software_version(id_obj.software_version)
+        temp_response.set_status(id_obj.status)
         return temp_response
 
 

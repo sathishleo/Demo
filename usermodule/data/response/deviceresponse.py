@@ -10,12 +10,15 @@ class device_response:
     software_version = None
     keyboard_brand = None
     status=None
+    tunnel_size=None
     def get(self):
         return json.dumps(self, default=lambda o: o.__dict__,
                           sort_keys=True, indent=4)
 
     def set_device_id(self, device_id):
         self.device_id = device_id
+    def set_tunnel_size(self, tunnel_size):
+        self.tunnel_size = tunnel_size
 
     def set_device_model(self, device_model):
         self.device_model = device_model

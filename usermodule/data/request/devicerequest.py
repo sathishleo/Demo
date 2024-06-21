@@ -8,11 +8,14 @@ class device_request:
     location = None
     software_version = None
     keyboard_brand = None
+    tunnel_size=None
 
 
     def __init__(self, object):
         if 'device_id' in object:
             self.device_id = object["device_id"]
+        if 'tunnel_size' in object:
+            self.tunnel_size = object["tunnel_size"]
         if 'device_model' in object:
             self.device_model = object["device_model"]
         if 'device_number' in object:
@@ -31,6 +34,8 @@ class device_request:
 
     def get_device_model(self):
         return self.device_model
+    def get_tunnel_size(self):
+        return self.tunnel_size
     def get_device_number(self):
         return self.device_number
 
