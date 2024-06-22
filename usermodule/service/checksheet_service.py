@@ -437,27 +437,28 @@ class dropdown_service:
         temp_response.set_status(id_obj.status)
         return temp_response
 
-    def modification_dropdown(self, drop_down_id, status):
-        modification_obj = DropDown.objects.filter(drop_down_id=drop_down_id).update(status=status)
-        if modification_obj == 0:
-            response = Error()
-            response.set_code("ID NOT MATCHED")
-            # response.set_name("Username already existed")
-            return response
-        else:
+    def modification_dropdown(self, drop_down_id, status,Flag):
+        if Flag=='DELETE':
+            modification_obj = DropDown.objects.get(drop_down_id=drop_down_id).delete()
             success_obj = Success()
             success_obj.set_message(SuccessMessage.DELETE_MESSAGE)
             success_obj.set_status(SuccessStatus.SUCCESS)
             return success_obj
+        else:
+            modification_obj = DropDown.objects.filter(drop_down_id=drop_down_id).update(status=status)
+            if modification_obj == 0:
+                response = Error()
+                response.set_code("ID NOT MATCHED")
+                # response.set_name("Username already existed")
+                return response
+            else:
+                success_obj = Success()
+                success_obj.set_message(SuccessMessage.DELETE_MESSAGE)
+                success_obj.set_status(SuccessStatus.SUCCESS)
+                return success_obj
 
     def fetch_dropdown(self, page_number, per_page, list_type):
 
-        # keywords = Product.objects.filter(
-        #     name__icontains=name
-        # )
-        # keywords = Product.objects.filter(
-        #     name__icontains=name
-        # ).values('name','code','Category__name')
         condition=Q()
         if list_type!=None and list_type!="":
             condition&=Q(list_type=list_type)

@@ -236,6 +236,7 @@ def view_dropdown(request, id):
     elif request.method == 'DELETE':
         service = dropdown_service()
         status = request.GET.get('status')
-        resp_obj = service.modification_dropdown(id, status)
+        Flag=request.GET.get("Flag")
+        resp_obj = service.modification_dropdown(id, status,Flag)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
         return response
