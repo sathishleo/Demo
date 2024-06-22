@@ -72,7 +72,8 @@ def view_device(request, device_id):
 def device_search(request):
     if request.method == 'GET':
         service = deviceservice()
-        resp_obj = service.device_list()
+        query_text=request.GET.get("query_text")
+        resp_obj = service.device_list(query_text)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
         return response
 
@@ -125,7 +126,8 @@ def view_operator(request, operator_id):
 def operator_search(request):
     if request.method == 'GET':
         service = Operator_service()
-        resp_obj = service.operator_list()
+        query_text=request.GET.get("query_text")
+        resp_obj = service.operator_list(query_text)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
         return response
 

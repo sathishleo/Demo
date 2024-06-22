@@ -102,17 +102,24 @@ class deviceservice:
                 success_obj.set_status(SuccessStatus.SUCCESS)
                 return success_obj
 
-    def device_list(self):
-        data = Device.objects.all()
-        if len(data) == 0:
+    def device_list(self, query_text):
+        demo_list = Demo_List()  # Initialize the Demo_List instance
+        data = Device.objects.filter(
+            Q(device_model__icontains=query_text) |
+            Q(device_number__icontains=query_text) |
+            Q(monitor_brand__icontains=query_text) |
+            Q(keyboard_brand__icontains=query_text)
+        )
+
+        if len(data) == 0:  # Check if no records are found
             response = Error()
-            response.set_code("No Records in Operator")
-            response.set_name("Username already existed")
+            response.set_code("No Records in Operator")  # Set error code
+            response.set_name("already existed")  # Set error message
             return response
         else:
-            demo_list=Demo_List()
-            for id_obj in data:
-                temp_response = device_response()
+            for id_obj in data:  # Iterate through the filtered device records
+                temp_response = device_response()  # Create a new device_response instance
+                # Set the fields of temp_response using the device record
                 temp_response.set_device_id(id_obj.device_id)
                 temp_response.set_device_number(id_obj.device_number)
                 temp_response.set_tunnel_size(id_obj.tunnel_size)
@@ -122,8 +129,8 @@ class deviceservice:
                 temp_response.set_monitor_brand(id_obj.monitor_brand)
                 temp_response.set_software_version(id_obj.software_version)
                 temp_response.set_status(id_obj.status)
-                demo_list.append(temp_response)
-            return demo_list
+                demo_list.append(temp_response)  # Append the response to the list
+            return demo_list  # Return the list of device responses
 
 
 class Operator_service:
@@ -200,27 +207,33 @@ class Operator_service:
                 return success_obj
 
 
-    def operator_list(self):
-        id_obj = Operator.objects.all()
-        if len(id_obj)==0:
-            response = Error()
-            response.set_code("No Records in Operator")
-            response.set_name("Username already existed")
-            return response
-        else:
+    def operator_list(self,query_text):
+        demo_list = Demo_List()  # Initialize the Demo_List instance
+        data = Device.objects.filter(
+            Q(device_model__icontains=query_text) |
+            Q(device_number__icontains=query_text) |
+            Q(monitor_brand__icontains=query_text) |
+            Q(keyboard_brand__icontains=query_text)
+        )
 
-            list_operator=Demo_List()
-            for id_obj in id_obj:
-                temp_response = Operator_response()
-                temp_response.set_operator_id(id_obj.operator_id)
-                temp_response.set_first_name(id_obj.first_name)
-                temp_response.set_last_name(id_obj.last_name)
-                temp_response.set_company(id_obj.company)
-                temp_response.set_employee_id(id_obj.employee_id)
-                temp_response.set_email_address(id_obj.email_address)
-                temp_response.set_phone(id_obj.phone)
-                list_operator.append(temp_response)
-            return list_operator
+        if len(data) == 0:  # Check if no records are found
+            response = Error()
+            response.set_code("No Records in Operator")  # Set error code
+            response.set_name("already existed")  # Set error message
+            return response
+        else:  # Create an instance of Demo_List
+            for operator in data:  # Iterate through each operator record
+                temp_response = Operator_response()  # Create a new Operator_response instance
+                # Set the fields of temp_response using the operator record
+                temp_response.set_operator_id(operator.operator_id)
+                temp_response.set_first_name(operator.first_name)
+                temp_response.set_last_name(operator.last_name)
+                temp_response.set_company(operator.company)
+                temp_response.set_employee_id(operator.employee_id)
+                temp_response.set_email_address(operator.email_address)
+                temp_response.set_phone(operator.phone)
+                demo_list.append(temp_response)  # Append the response to the list
+            return demo_list  # Return the list of operator responses
 
 
 class ECAC_service:
