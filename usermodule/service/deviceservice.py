@@ -187,7 +187,7 @@ class Operator_service:
         return temp_response
 
     def modification_operator(self,operator_id,status,Flag):
-        if Flag==True:
+        if Flag=="DELETE":
             modification_obj = Operator.objects.get(operator_id=operator_id).delete()
             success_obj = Success()
             success_obj.set_message(SuccessMessage.DELETE_MESSAGE)
