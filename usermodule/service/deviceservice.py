@@ -56,7 +56,7 @@ class deviceservice:
                     temp_response.set_software_version(i.software_version)
                     temp_response.set_status(i.status)
                     pro_list.append(temp_response)
-                vpage = DemoPaginator(obj, vys_page.get_index(), 5)
+                vpage = DemoPaginator(obj, vys_page.get_index(), 10)
                 pro_list.set_pagination(vpage)
                 return pro_list
         except Exception as e:
@@ -136,7 +136,7 @@ class Operator_service:
                     temp_response.set_phone(i.phone)
 
                     pro_list.append(temp_response)
-                vpage = DemoPaginator(obj, vys_page.get_index(), 5)
+                vpage = DemoPaginator(obj, vys_page.get_index(), 10)
                 pro_list.set_pagination(vpage)
                 return pro_list
         except Exception as e:
@@ -226,7 +226,7 @@ class ECAC_service:
 
 
                     pro_list.append(temp_response)
-                vpage = DemoPaginator(obj, vys_page.get_index(), 5)
+                vpage = DemoPaginator(obj, vys_page.get_index(), 10)
                 pro_list.set_pagination(vpage)
                 return pro_list
         except Exception as e:

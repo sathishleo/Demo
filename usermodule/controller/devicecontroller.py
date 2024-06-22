@@ -13,6 +13,14 @@ from utlis.dataservice.demo_page import Page_view
 from utlis.dataservice.demo_permission import Permission
 
 
+# @swagger_auto_schema(
+#     manual_parameters=[
+#                           openapi.Parameter('param1', openapi.IN_QUERY, description="Parameter 1",
+#                                             type=openapi.TYPE_STRING),
+#                           openapi.Parameter('param2', openapi.IN_QUERY, description="Parameter 2",
+#                                             type=openapi.TYPE_INTEGER)
+#                       ]
+
 @csrf_exempt
 @api_view(['POST', 'GET'])
 # @authentication_classes([Authentication])
@@ -33,7 +41,7 @@ def device_create(request):
         page = request.GET.get('page', 1)
         page = int(page)
         device_model = request.GET.get('device_model')
-        vys_page = Page_view(page, 5)
+        vys_page = Page_view(page, 10)
         service = deviceservice()
         resp_obj = service.fetch_device(vys_page, device_model)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
@@ -76,7 +84,7 @@ def operator_create(request):
         page = request.GET.get('page', 1)
         page = int(page)
         first_name = request.GET.get('first_name')
-        vys_page = Page_view(page, 5)
+        vys_page = Page_view(page, 10)
         service = Operator_service()
         resp_obj = service.fetch_operator(vys_page, first_name)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
@@ -117,7 +125,7 @@ def ecac_create(request):
         page = request.GET.get('page', 1)
         page = int(page)
         test_view = request.GET.get('test_view')
-        vys_page = Page_view(page, 5)
+        vys_page = Page_view(page, 10)
         service = ECAC_service()
         resp_obj = service.fetch_ecac(vys_page, test_view)
         response = HttpResponse(resp_obj.get(), content_type="application/json")

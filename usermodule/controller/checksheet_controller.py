@@ -37,7 +37,7 @@ def checksheet_create(request):
         page = request.GET.get('page', 1)
         page = int(page)
         control_operator_id = request.GET.get('control_operator_id')
-        vys_page = Page_view(page, 5)
+        vys_page = Page_view(page, 10)
         service = Controll_service()
         resp_obj = service.fetch_Controll(vys_page, control_operator_id)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
@@ -81,7 +81,7 @@ def checkrole_create(request):
         page = request.GET.get('page', 1)
         page = int(page)
         control_operator_id = request.GET.get('control_operator_id')
-        vys_page = Page_view(page, 5)
+        vys_page = Page_view(page, 10)
         service = checkrule_service()
         resp_obj = service.fetch_checkrule(vys_page, control_operator_id)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
@@ -127,7 +127,7 @@ def scandetails_create(request):
         page = request.GET.get('page', 1)
         page = int(page)
         shift_details = request.GET.get('shift_details')
-        vys_page = Page_view(page, 5)
+        vys_page = Page_view(page, 10)
         service = scandetails_service()
         resp_obj = service.fetch_scandetails(vys_page, shift_details)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
@@ -172,7 +172,7 @@ def shiftdetails_create(request):
         page = request.GET.get('page', 1)
         page = int(page)
         supervisor = request.GET.get('supervisor')
-        vys_page = Page_view(page, 5)
+        vys_page = Page_view(page, 10)
         service = shiftdetails_service()
         resp_obj = service.fetch_shiftdetails(vys_page, supervisor)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
@@ -213,14 +213,15 @@ def dropdown_create(request):
         return response
 
     if request.method == 'GET':
-        page = request.GET.get('page', 1)
-        page = int(page)
+        page_number = request.GET.get('page', 1)
+        per_page=request.GET.get("limit",10)
+        # page = int(page_number)
         list_type = request.GET.get('list_type')
-        vys_page = Page_view(page, 5)
+        # vys_page = Page_view(page, per_page/)
         service = dropdown_service()
-        resp_obj = service.fetch_dropdown(vys_page, list_type)
-        response = HttpResponse(resp_obj.get(), content_type="application/json")
-        return response
+        resp_obj = service.fetch_dropdown(page_number,per_page, list_type)
+        # response = HttpResponse(resp_obj.get(), content_type="application/json")
+        return resp_obj
 
 
 @csrf_exempt

@@ -1,4 +1,6 @@
+from django.core.paginator import Paginator
 from django.db.models import Q, F
+from django.http import JsonResponse
 from django.utils.timezone import now
 
 from usermodule.data.response.checkresponse import ControlSheet_response, CheckRule_response
@@ -50,7 +52,7 @@ class Controll_service:
                     temp_response.set_check_date(str(i.check_date))
                     temp_response.set_remark(i.remark)
                     pro_list.append(temp_response)
-                vpage = DemoPaginator(obj, vys_page.get_index(), 5)
+                vpage = DemoPaginator(obj, vys_page.get_index(), 10)
                 pro_list.set_pagination(vpage)
                 return pro_list
         except Exception as e:
@@ -117,7 +119,7 @@ class checkrule_service:
                     temp_response.set_remark(i.remark)
 
                     pro_list.append(temp_response)
-                vpage = DemoPaginator(obj, vys_page.get_index(), 5)
+                vpage = DemoPaginator(obj, vys_page.get_index(), 10)
                 pro_list.set_pagination(vpage)
                 return pro_list
         except Exception as e:
@@ -128,9 +130,10 @@ class checkrule_service:
             return error_obj
 
     def checkrule_get(self, id):
-        id_obj = CheckRule.objects.get(checkrule_id=checkrule_id)
+        id_obj = CheckRule.objects.get(checkrule_id=id)
         temp_response = CheckRule_response()
         temp_response.set_rule_choice(id_obj.rule_choice)
+        temp_response.set_checkrule_id(id_obj.checkrule_id)
         temp_response.set_rule_id(id_obj.rule_id)
         temp_response.set_control_sheet_id(id_obj.control_sheet_id)
         temp_response.set_remark(id_obj.remark)
@@ -209,7 +212,7 @@ class scandetails_service:
                     temp_response.set_status(i.status)
 
                     pro_list.append(temp_response)
-                vpage = DemoPaginator(obj, vys_page.get_index(), 5)
+                vpage = DemoPaginator(obj, vys_page.get_index(), 10)
                 pro_list.set_pagination(vpage)
                 return pro_list
         except Exception as e:
@@ -348,7 +351,7 @@ class shiftdetails_service:
                     temp_response.set_status(i.status)
 
                     pro_list.append(temp_response)
-                vpage = DemoPaginator(obj, vys_page.get_index(), 5)
+                vpage = DemoPaginator(obj, vys_page.get_index(), 10)
                 pro_list.set_pagination(vpage)
                 return pro_list
         except Exception as e:
@@ -399,37 +402,37 @@ class dropdown_service:
         temp_response.set_status(DropDown_obj.status)
         return temp_response
 
-    def fetch_dropdown(self, vys_page, list_type):
-        try:
-            condition = Q(status=1)
-            if list_type != " " and list_type != None:
-                condition &= Q(list_type=list_type)
-            obj = DropDown.objects.filter(condition)[
-                  vys_page.get_offset():vys_page.get_query_limit()]
-
-            list_length = len(obj)
-            pro_list = Demo_List()
-            if list_length <= 0:
-                return pro_list
-            else:
-
-                for i in obj:
-                    temp_response = DropDown_response()
-                    temp_response.set_drop_down_id(i.drop_down_id)
-                    temp_response.set_list_item(i.list_item)
-                    temp_response.set_list_type(i.list_type)
-                    temp_response.set_status(i.status)
-
-                    pro_list.append(temp_response)
-                vpage = DemoPaginator(obj, vys_page.get_index(), 5)
-                pro_list.set_pagination(vpage)
-                return pro_list
-        except Exception as e:
-            error_obj = Error()
-            print(e)
-            # error_obj.set_code(ErrorMessage.INVALID_DATA)
-            error_obj.set_description(str(e))
-            return error_obj
+    # def fetch_dropdown(self, vys_page, list_type,limit):
+    #     try:
+    #         condition = Q(status=1)
+    #         if list_type != " " and list_type != None:
+    #             condition &= Q(list_type=list_type)
+    #         obj = DropDown.objects.filter(condition)[
+    #               vys_page.get_offset():vys_page.get_query_limit()]
+    #
+    #         list_length = len(obj)
+    #         pro_list = Demo_List()
+    #         if list_length <= 0:
+    #             return pro_list
+    #         else:
+    #
+    #             for i in obj:
+    #                 temp_response = DropDown_response()
+    #                 temp_response.set_drop_down_id(i.drop_down_id)
+    #                 temp_response.set_list_item(i.list_item)
+    #                 temp_response.set_list_type(i.list_type)
+    #                 temp_response.set_status(i.status)
+    #
+    #                 pro_list.append(temp_response)
+    #             vpage = DemoPaginator(obj, vys_page.get_index(), str(limit))
+    #             pro_list.set_pagination(vpage)
+    #             return pro_list
+    #     except Exception as e:
+    #         error_obj = Error()
+    #         print(e)
+    #         # error_obj.set_code(ErrorMessage.INVALID_DATA)
+    #         error_obj.set_description(str(e))
+    #         return error_obj
 
     def dropdown_get(self, drop_down_id):
         id_obj = DropDown.objects.get(drop_down_id=drop_down_id)
@@ -452,4 +455,34 @@ class dropdown_service:
             success_obj.set_message(SuccessMessage.DELETE_MESSAGE)
             success_obj.set_status(SuccessStatus.SUCCESS)
             return success_obj
+
+    def fetch_dropdown(self, page_number, per_page, list_type):
+
+        # keywords = Product.objects.filter(
+        #     name__icontains=name
+        # )
+        # keywords = Product.objects.filter(
+        #     name__icontains=name
+        # ).values('name','code','Category__name')
+        condition=Q()
+        if list_type!=None and list_type!="":
+            condition&=Q(list_type=list_type)
+        keywords = DropDown.objects.filter(condition).values('drop_down_id','list_item' ,'list_type','status')
+        count=DropDown.objects.count()
+        paginator = Paginator(keywords, per_page)
+        data=[]
+        page_obj = paginator.get_page(page_number)
+        for kw in page_obj.object_list:
+            data.append({"drop_down_id": kw["drop_down_id"],"list_item":kw["list_item"],"list_type":kw["list_type"],"status":kw["status"]})
+
+        payload = {
+            "page": {
+                "current": page_obj.number,
+                "has_next": page_obj.has_next(),
+                "has_previous": page_obj.has_previous(),
+                "count":count
+            },
+            "data": data
+        }
+        return JsonResponse(payload)
 

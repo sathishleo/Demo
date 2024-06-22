@@ -50,7 +50,7 @@ class TimeMaintenance_service:
                     temp_response.set_current_status(i.current_status)
                     temp_response.set_status(i.status)
                     pro_list.append(temp_response)
-                vpage = DemoPaginator(obj, vys_page.get_index(), 5)
+                vpage = DemoPaginator(obj, vys_page.get_index(), 10)
                 pro_list.set_pagination(vpage)
                 return pro_list
         except Exception as e:
@@ -125,7 +125,7 @@ class PauseDetails_service:
                     temp_response.set_remarks(i.remarks)
                     temp_response.set_status(i.status)
                     pro_list.append(temp_response)
-                vpage = DemoPaginator(obj, vys_page.get_index(), 5)
+                vpage = DemoPaginator(obj, vys_page.get_index(), 10)
                 pro_list.set_pagination(vpage)
                 return pro_list
         except Exception as e:
