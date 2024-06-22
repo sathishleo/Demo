@@ -36,14 +36,15 @@ def create_shiftmaintaince(request):
         return response
 
     if request.method == 'GET':
-        page = request.GET.get('page', 1)
-        page = int(page)
+        page_number = request.GET.get('page', 1)
+        per_page = request.GET.get('limit', 10)
         time_type = request.GET.get('time_type')
-        vys_page = Page_view(page, 10)
+        search = request.GET.get('search')
+
         service = TimeMaintenance_service()
-        resp_obj = service.fetch_shiftmaintainance(vys_page, time_type)
-        response = HttpResponse(resp_obj.get(), content_type="application/json")
-        return response
+        resp_obj = service.fetch_TimeMaintenance(page_number, per_page, time_type, search)
+        # response = HttpResponse(resp_obj.get(), content_type="application/json")
+        return resp_obj
 
 
 @csrf_exempt
@@ -59,7 +60,9 @@ def view_shiftmaintaince(request, time_maintenance_id):
     elif request.method == 'DELETE':
         service = TimeMaintenance_service()
         status = request.GET.get('status')
-        resp_obj = service.modification_shiftmaintainance(time_maintenance_id, status)
+        Flag = request.GET.get('Flag')
+        current_status = request.GET.get('current_status')
+        resp_obj = service.modification_shiftmaintainance(time_maintenance_id, status,Flag,current_status)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
         return response
 @csrf_exempt
@@ -93,15 +96,16 @@ def create_PauseDetails(request):
 @api_view(['GET', 'DELETE'])
 # @authentication_classes([Authentication])
 # @permission_classes([IsAuthenticated,Permission])
-def view_PauseDetails(request, id):
+def view_PauseDetails(request, pause_details_id):
     if request.method == 'GET':
         service = PauseDetails_service()
-        resp_obj = service.scanmaintainance_get(id)
+        resp_obj = service.scanmaintainance_get(pause_details_id)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
         return response
     elif request.method == 'DELETE':
         service = PauseDetails_service()
         status = request.GET.get('status')
-        resp_obj = service.modification_scanmaintainance(id, status)
+        Flag = request.GET.get('Flag')
+        resp_obj = service.modification_scanmaintainance(status,pause_details_id, Flag)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
         return response

@@ -212,31 +212,39 @@ class ECAC_service:
         temp_response.set_test_5(ecac_obj.test_5)
         return temp_response
 
-    def fetch_ecac(self, page_number, per_page, test_view):
-        condition = Q()
-        if test_view != None and test_view != "":
-            condition &= Q(test_view__icontains=test_view)
-        keywords = ECAC.objects.filter(condition).values('operator_id', 'device_id', 'ecac_id', 'position',
-                                                             'test_date', 'test_time', 'test_view', 'status','test_1test_2','test_3','test_4a','test_4b','test_5')
-        count = ECAC.objects.count()
-        paginator = Paginator(keywords, per_page)
-        data = []
-        page_obj = paginator.get_page(page_number)
-        for kw in page_obj.object_list:
-            data.append({"operator_id": kw["operator_id"], "device_id": kw["device_id"], "ecac_id": kw["ecac_id"],
-                         "position": kw["position"],
-                         "test_date": kw["test_date"], "test_time": kw["test_time"], "test_view": kw["test_view"],
-                         "status": kw["status"],"test_1test_2": kw["test_1test_2"],"test_3": kw["test_3"],"test_4a": kw["test_4a"],"test_4b": kw["test_4b"],"test_5": kw["test_5"]})
-        payload = {
-            "page": {
-                "current": page_obj.number,
-                "has_next": page_obj.has_next(),
-                "has_previous": page_obj.has_previous(),
-                "count": count
-            },
-            "data": data
-        }
-        return JsonResponse(payload)
+    def fetch_ecac(self, page_number, per_page, test_view,query_text):
+        if query_text==None and query_text=="" :
+            keywords = ECAC.objects.filter(
+                Q(test_view__icontains=query_text) |
+                Q(device_id__icontains=query_text) |
+                Q(operator_id__icontains=query_text)
+            ).values('operator_id', 'first_name', 'last_name', 'company', 'employee_id', 'email_address', 'phone',
+                     'status')
+        else:
+            condition = Q()
+            if test_view != None and test_view != "":
+                condition &= Q(test_view__icontains=test_view)
+            keywords = ECAC.objects.filter(condition).values('operator_id', 'device_id', 'ecac_id', 'position',
+                                                                 'test_date', 'test_time', 'test_view', 'status','test_1test_2','test_3','test_4a','test_4b','test_5')
+            count = ECAC.objects.count()
+            paginator = Paginator(keywords, per_page)
+            data = []
+            page_obj = paginator.get_page(page_number)
+            for kw in page_obj.object_list:
+                data.append({"operator_id": kw["operator_id"], "device_id": kw["device_id"], "ecac_id": kw["ecac_id"],
+                             "position": kw["position"],
+                             "test_date": kw["test_date"], "test_time": kw["test_time"], "test_view": kw["test_view"],
+                             "status": kw["status"],"test_1test_2": kw["test_1test_2"],"test_3": kw["test_3"],"test_4a": kw["test_4a"],"test_4b": kw["test_4b"],"test_5": kw["test_5"]})
+            payload = {
+                "page": {
+                    "current": page_obj.number,
+                    "has_next": page_obj.has_next(),
+                    "has_previous": page_obj.has_previous(),
+                    "count": count
+                },
+                "data": data
+            }
+            return JsonResponse(payload)
 
     def ecac_get(self, ecac_id):
         id_obj = ECAC.objects.get(ecac_id=ecac_id)
@@ -254,18 +262,25 @@ class ECAC_service:
         temp_response.set_test4b(id_obj.test_4b)
         temp_response.set_test_5(id_obj.test_5)
         return temp_response
-    def modification_ecac(self, ecac_id,status):
-        modification_obj = ECAC.objects.filter(ecac_id=ecac_id).update(status=status)
-
-        if modification_obj == 0:
-            response = Error()
-            response.set_code("ID NOT MATCHED")
-            # response.set_name("Username already existed")
-            return response
-        else:
+    def modification_ecac(self, ecac_id,status,Flag):
+        if Flag=='DELETE':
+            modification_obj = ECAC.objects.get(ecac_id=ecac_id).delete()
             success_obj = Success()
             success_obj.set_message(SuccessMessage.DELETE_MESSAGE)
             success_obj.set_status(SuccessStatus.SUCCESS)
             return success_obj
+        else:
+            modification_obj = ECAC.objects.filter(ecac_id=ecac_id).update(status=status)
+
+            if modification_obj == 0:
+                response = Error()
+                response.set_code("ID NOT MATCHED")
+                # response.set_name("Username already existed")
+                return response
+            else:
+                success_obj = Success()
+                success_obj.set_message(SuccessMessage.DELETE_MESSAGE)
+                success_obj.set_status(SuccessStatus.SUCCESS)
+                return success_obj
 
 

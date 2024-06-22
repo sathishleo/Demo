@@ -187,40 +187,74 @@ class scandetails_service:
         temp_response.set_end_time(str(ScanDetails_obj.end_time))
         return temp_response
 
-    def fetch_scandetails(self, vys_page, shift_details):
-        try:
-            condition = Q(status=1)
-            if shift_details != " " and shift_details != None:
-                condition &= Q(shift_details_id=shift_details)
-            obj = ScanDetails.objects.filter(condition)[
-                  vys_page.get_offset():vys_page.get_query_limit()]
+    # def fetch_scandetails(self, vys_page, shift_details):
+    #     try:
+    #         condition = Q(status=1)
+    #         if shift_details != " " and shift_details != None:
+    #             condition &= Q(shift_details_id=shift_details)
+    #         obj = ScanDetails.objects.filter(condition)[
+    #               vys_page.get_offset():vys_page.get_query_limit()]
+    #
+    #         list_length = len(obj)
+    #         pro_list = Demo_List()
+    #         if list_length <= 0:
+    #             return pro_list
+    #         else:
+    #
+    #             for i in obj:
+    #                 temp_response = ScanDetails_response()
+    #                 temp_response.set_scan_details_id(i.scan_details_id)
+    #                 temp_response.set_device_id(i.device_id)
+    #                 temp_response.set_operator_id(i.operator_id)
+    #                 temp_response.set_scan_date(str(i.scan_date))
+    #                 temp_response.set_start_time(str(i.start_time))
+    #                 temp_response.set_end_time(str(i.end_time))
+    #                 temp_response.set_status(i.status)
+    #
+    #                 pro_list.append(temp_response)
+    #             vpage = DemoPaginator(obj, vys_page.get_index(), 10)
+    #             pro_list.set_pagination(vpage)
+    #             return pro_list
+    #     except Exception as e:
+    #         error_obj = Error()
+    #         print(e)
+    #         # error_obj.set_code(ErrorMessage.INVALID_DATA)
+    #         error_obj.set_description(str(e))
+    #         return error_obj
 
-            list_length = len(obj)
-            pro_list = Demo_List()
-            if list_length <= 0:
-                return pro_list
-            else:
+    def fetch_ScanDetails(self, page_number, per_page, shift_details, query_text):
+        if query_text != None and query_text != "":
+            keywords = ScanDetails.objects.filter(
+                Q(device_id=query_text)|
+                Q(operator_id=query_text)
+            ).values('scan_details_id', 'device_id', 'operator_id', 'scan_date', 'start_time', 'end_time','shift_details','status')
+        else:
+            condition = Q()
+            if shift_details != None and shift_details != "":
+                condition &= Q(shift_details_id=int(shift_details))
+            keywords = ScanDetails.objects.filter(condition).values('scan_details_id', 'device_id', 'operator_id', 'scan_date', 'start_time', 'end_time','shift_details','status')
+        count = ScanDetails.objects.count()
+        paginator = Paginator(keywords, per_page)
+        data = []
+        page_obj = paginator.get_page(page_number)
+        for kw in page_obj.object_list:
+            data.append({"scan_details_id": kw["scan_details_id"], "device_id": kw["device_id"], "operator_id": kw["operator_id"],
+                         "scan_date": str(kw["scan_date"]),
+                         "start_time": str(kw["start_time"]),
+                         "shift_details": kw["shift_details"],
+                         "end_time": str(kw["end_time"]),
+                         "status": kw["status"]})
+        payload = {
+            "page": {
+                "current": page_obj.number,
+                "has_next": page_obj.has_next(),
+                "has_previous": page_obj.has_previous(),
+                "count": count
+            },
+            "data": data
+        }
+        return JsonResponse(payload)
 
-                for i in obj:
-                    temp_response = ScanDetails_response()
-                    temp_response.set_scan_details_id(i.scan_details_id)
-                    temp_response.set_device_id(i.device_id)
-                    temp_response.set_operator_id(i.operator_id)
-                    temp_response.set_scan_date(str(i.scan_date))
-                    temp_response.set_start_time(str(i.start_time))
-                    temp_response.set_end_time(str(i.end_time))
-                    temp_response.set_status(i.status)
-
-                    pro_list.append(temp_response)
-                vpage = DemoPaginator(obj, vys_page.get_index(), 10)
-                pro_list.set_pagination(vpage)
-                return pro_list
-        except Exception as e:
-            error_obj = Error()
-            print(e)
-            # error_obj.set_code(ErrorMessage.INVALID_DATA)
-            error_obj.set_description(str(e))
-            return error_obj
 
     def scandetails_get(self, scan_details_id):
         id_obj = ScanDetails.objects.get(scan_details_id=scan_details_id)
@@ -235,18 +269,26 @@ class scandetails_service:
 
         return temp_response
 
-    def modification_scandetails(self, scan_details_id, status):
-        modification_obj = ScanDetails.objects.filter(scan_details_id=scan_details_id).update(status=status)
-        if modification_obj == 0:
-            response = Error()
-            response.set_code("ID NOT MATCHED")
-            # response.set_name("Username already existed")
-            return response
-        else:
+    def modification_scandetails(self,scan_details_id, status,Flag):
+        if Flag=='DELETE':
+            modification_obj = ScanDetails.objects.get(scan_details_id=scan_details_id).delete()
             success_obj = Success()
             success_obj.set_message(SuccessMessage.DELETE_MESSAGE)
             success_obj.set_status(SuccessStatus.SUCCESS)
             return success_obj
+        else:
+
+            modification_obj = ScanDetails.objects.filter(scan_details_id=scan_details_id).update(status=status)
+            if modification_obj == 0:
+                response = Error()
+                response.set_code("ID NOT MATCHED")
+                # response.set_name("Username already existed")
+                return response
+            else:
+                success_obj = Success()
+                success_obj.set_message(SuccessMessage.DELETE_MESSAGE)
+                success_obj.set_status(SuccessStatus.SUCCESS)
+                return success_obj
 
     def validation_scan(self, operator_id):
     # Retrieve the latest maintenance record created by the employee
@@ -308,11 +350,11 @@ class scandetails_service:
     #     return check
 class shiftdetails_service:
 
-    def create_shiftdetails(self, request_obj,img):
+    def create_shiftdetails(self, request_obj):
         if request_obj.get_shift_details_id() is  None:
-            ShiftDetails_obj = ShiftDetails.objects.create(shift_date=request_obj.get_shift_date(),start_time=request_obj.get_start_time(),end_time=request_obj.get_end_time(),scan_count=request_obj.get_scan_count(),supervisor=request_obj.get_supervisor(),remark=request_obj.get_remark(),supervisor_signature=img)
+            ShiftDetails_obj = ShiftDetails.objects.create(shift_date=request_obj.get_shift_date(),start_time=request_obj.get_start_time(),end_time=request_obj.get_end_time(),scan_count=request_obj.get_scan_count(),supervisor=request_obj.get_supervisor(),remark=request_obj.get_remark())
         else:
-            ShiftDetails_obj = ShiftDetails.objects.filter(shift_details_id=request_obj.get_shift_details_id()).update(shift_date=request_obj.get_shift_date(),start_time=request_obj.get_start_time(),end_time=request_obj.get_end_time(),scan_count=request_obj.get_scan_count(),supervisor=request_obj.get_supervisor(),remark=request_obj.get_remark(),updated_date=now(),supervisor_signature=img)
+            ShiftDetails_obj = ShiftDetails.objects.filter(shift_details_id=request_obj.get_shift_details_id()).update(shift_date=request_obj.get_shift_date(),start_time=request_obj.get_start_time(),end_time=request_obj.get_end_time(),scan_count=request_obj.get_scan_count(),supervisor=request_obj.get_supervisor(),remark=request_obj.get_remark(),updated_date=now())
             ShiftDetails_obj = ShiftDetails.objects.get(shift_details_id=request_obj.get_shift_details_id())
         temp_response = ShiftDetail_response()
         temp_response.set_shift_details_id(ShiftDetails_obj.shift_details_id)

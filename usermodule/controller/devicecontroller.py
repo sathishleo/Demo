@@ -147,14 +147,12 @@ def ecac_create(request):
         return response
 
     if request.method == 'GET':
-        page = request.GET.get('page', 1)
-        page = int(page)
         test_view = request.GET.get('test_view')
         page_number = request.GET.get('page', 1)
         per_page = request.GET.get("limit", 10)
+        search = request.GET.get("search", 10)
         service = ECAC_service()
-        resp_obj = service.fetch_ecac(page_number, per_page, test_view)
-        # response = HttpResponse(resp_obj.get(), content_type="application/json")
+        resp_obj = service.fetch_ecac(page_number, per_page, test_view,search)
         return resp_obj
 
 @csrf_exempt
@@ -170,6 +168,7 @@ def view_ecac(request, ecac_id):
     elif request.method == 'DELETE':
         service = ECAC_service()
         status = request.GET.get('status')
-        resp_obj = service.modification_ecac(ecac_id, status)
+        Flag=request.GET.get("Flag")
+        resp_obj = service.modification_ecac(ecac_id, status,Flag)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
         return response

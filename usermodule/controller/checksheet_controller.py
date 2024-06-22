@@ -124,14 +124,14 @@ def scandetails_create(request):
         return response
 
     if request.method == 'GET':
-        page = request.GET.get('page', 1)
-        page = int(page)
+        page_number = request.GET.get('page', 1)
+        per_page = request.GET.get('limit', 10)
         shift_details = request.GET.get('shift_details')
-        vys_page = Page_view(page, 10)
+        search = request.GET.get('search')
         service = scandetails_service()
-        resp_obj = service.fetch_scandetails(vys_page, shift_details)
-        response = HttpResponse(resp_obj.get(), content_type="application/json")
-        return response
+        resp_obj = service.fetch_ScanDetails( page_number, per_page, shift_details, search)
+        # response = HttpResponse(resp_obj.get(), content_type="application/json")
+        return resp_obj
 
 
 @csrf_exempt
@@ -147,7 +147,8 @@ def view_scandetails(request, scan_details_id):
     elif request.method == 'DELETE':
         service = scandetails_service()
         status = request.GET.get('status')
-        resp_obj = service.modification_scandetails(scan_details_id, status)
+        Flag = request.GET.get('Flag')
+        resp_obj = service.modification_scandetails(scan_details_id, status,Flag)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
         return response
 
@@ -161,7 +162,7 @@ def shiftdetails_create(request):
         # emp_service = Emp_service()
         # emp_id = emp_service.get_empid_from_userid(user_id)
         shiftdetails_data =json.loads(request.data.dict().get('data'))
-        img=request.FILES["file"]
+        # img=request.FILES["file"]
         shiftdetails_obj = ShiftDetail_request(shiftdetails_data)
         Shiftdetails_service = shiftdetails_service()
         resp_obj = Shiftdetails_service.create_shiftdetails(shiftdetails_obj,img)
