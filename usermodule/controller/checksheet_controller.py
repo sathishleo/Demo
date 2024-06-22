@@ -216,9 +216,10 @@ def dropdown_create(request):
         per_page=request.GET.get("limit",10)
         # page = int(page_number)
         list_type = request.GET.get('list_type')
+        search = request.GET.get('search')
         # vys_page = Page_view(page, per_page/)
         service = dropdown_service()
-        resp_obj = service.fetch_dropdown(page_number,per_page, list_type)
+        resp_obj = service.fetch_dropdown(page_number,per_page, list_type,search)
         # response = HttpResponse(resp_obj.get(), content_type="application/json")
         return resp_obj
 

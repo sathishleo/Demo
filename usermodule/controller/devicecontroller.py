@@ -38,14 +38,14 @@ def device_create(request):
         return response
 
     if request.method == 'GET':
-        page = request.GET.get('page', 1)
-        page = int(page)
+        page_number = request.GET.get('page', 1)
+        per_page = request.GET.get("limit", 10)
         device_model = request.GET.get('device_model')
-        vys_page = Page_view(page, 10)
+        search = request.GET.get('search')
         service = deviceservice()
-        resp_obj = service.fetch_device(vys_page, device_model)
-        response = HttpResponse(resp_obj.get(), content_type="application/json")
-        return response
+        resp_obj = service.fetch_device( page_number, per_page, device_model,search)
+        # response = HttpResponse(resp_obj.get(), content_type="application/json")
+        return resp_obj
 
 @csrf_exempt
 @api_view(['GET', 'DELETE'])
@@ -65,17 +65,17 @@ def view_device(request, device_id):
         response = HttpResponse(resp_obj.get(), content_type="application/json")
         return response
 
-@csrf_exempt
-@api_view(['GET'])
-# @authentication_classes([Authentication])
-# @permission_classes([IsAuthenticated,Permission])
-def device_search(request):
-    if request.method == 'GET':
-        service = deviceservice()
-        query_text=request.GET.get("query_text")
-        resp_obj = service.device_list(query_text)
-        response = HttpResponse(resp_obj.get(), content_type="application/json")
-        return response
+# @csrf_exempt
+# @api_view(['GET'])
+# # @authentication_classes([Authentication])
+# # @permission_classes([IsAuthenticated,Permission])
+# def device_search(request):
+#     if request.method == 'GET':
+#         service = deviceservice()
+#         query_text=request.GET.get("query_text")
+#         resp_obj = service.fetch_device(query_text)
+#         response = HttpResponse(resp_obj.get(), content_type="application/json")
+#         return response
 
 @csrf_exempt
 @api_view(['POST', 'GET'])
@@ -97,8 +97,9 @@ def operator_create(request):
         page_number = request.GET.get('page', 1)
         per_page = request.GET.get("limit", 10)
         first_name = request.GET.get('first_name')
+        search = request.GET.get('search')
         service = Operator_service()
-        resp_obj = service.fetch_operator(page_number, per_page, first_name)
+        resp_obj = service.fetch_operator(page_number, per_page, first_name,search)
         return resp_obj
 
 @csrf_exempt
