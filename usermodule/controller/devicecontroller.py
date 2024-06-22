@@ -60,7 +60,19 @@ def view_device(request, device_id):
     elif request.method == 'DELETE':
         service = deviceservice()
         status = request.GET.get('status')
-        resp_obj = service.modification_device(device_id, status)
+        Flag=request.GET.get("Flag")
+        resp_obj = service.modification_device(device_id, status,Flag)
+        response = HttpResponse(resp_obj.get(), content_type="application/json")
+        return response
+
+@csrf_exempt
+@api_view(['GET'])
+# @authentication_classes([Authentication])
+# @permission_classes([IsAuthenticated,Permission])
+def device_search(request):
+    if request.method == 'GET':
+        service = deviceservice()
+        resp_obj = service.device_list()
         response = HttpResponse(resp_obj.get(), content_type="application/json")
         return response
 
@@ -81,14 +93,12 @@ def operator_create(request):
         return response
 
     if request.method == 'GET':
-        page = request.GET.get('page', 1)
-        page = int(page)
+        page_number = request.GET.get('page', 1)
+        per_page = request.GET.get("limit", 10)
         first_name = request.GET.get('first_name')
-        vys_page = Page_view(page, 10)
         service = Operator_service()
-        resp_obj = service.fetch_operator(vys_page, first_name)
-        response = HttpResponse(resp_obj.get(), content_type="application/json")
-        return response
+        resp_obj = service.fetch_operator(page_number, per_page, first_name)
+        return resp_obj
 
 @csrf_exempt
 @api_view(['GET', 'DELETE'])
@@ -103,7 +113,19 @@ def view_operator(request, operator_id):
     elif request.method == 'DELETE':
         service = Operator_service()
         status = request.GET.get('status')
-        resp_obj = service.modification_operator(operator_id, status)
+        Flag=request.GET.get('Flag')
+        resp_obj = service.modification_operator(operator_id, status,Flag)
+        response = HttpResponse(resp_obj.get(), content_type="application/json")
+        return response
+
+@csrf_exempt
+@api_view(['GET'])
+# @authentication_classes([Authentication])
+# @permission_classes([IsAuthenticated,Permission])
+def operator_search(request):
+    if request.method == 'GET':
+        service = Operator_service()
+        resp_obj = service.operator_list()
         response = HttpResponse(resp_obj.get(), content_type="application/json")
         return response
 
@@ -125,11 +147,12 @@ def ecac_create(request):
         page = request.GET.get('page', 1)
         page = int(page)
         test_view = request.GET.get('test_view')
-        vys_page = Page_view(page, 10)
+        page_number = request.GET.get('page', 1)
+        per_page = request.GET.get("limit", 10)
         service = ECAC_service()
-        resp_obj = service.fetch_ecac(vys_page, test_view)
-        response = HttpResponse(resp_obj.get(), content_type="application/json")
-        return response
+        resp_obj = service.fetch_ecac(page_number, per_page, test_view)
+        # response = HttpResponse(resp_obj.get(), content_type="application/json")
+        return resp_obj
 
 @csrf_exempt
 @api_view(['GET', 'DELETE'])

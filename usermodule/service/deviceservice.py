@@ -1,4 +1,6 @@
+from django.core.paginator import Paginator
 from django.db.models import Q
+from django.http import JsonResponse
 from django.utils.timezone import now
 
 from usermodule.data.response.deviceresponse import device_response, Operator_response, ECAC_response
@@ -79,19 +81,49 @@ class deviceservice:
         return temp_response
 
 
-    def modification_device(self,device_id,status):
-        # Status=obj_status()
-        modification_obj=Device.objects.filter(device_id=int(device_id)).update(status=status)
-        if modification_obj==0:
-            response = Error()
-            response.set_code("ID NOT MATCHED")
-            # response.set_name("Username already existed")
-            return response
-        else:
-            success_obj=Success()
+    def modification_device(self,device_id,status,Flag):
+        if Flag =="DELETE":
+            modification_obj = Device.objects.get(device_id=device_id).delete()
+            success_obj = Success()
             success_obj.set_message(SuccessMessage.DELETE_MESSAGE)
             success_obj.set_status(SuccessStatus.SUCCESS)
             return success_obj
+        else:
+
+            modification_obj=Device.objects.filter(device_id=int(device_id)).update(status=status)
+            if modification_obj==0:
+                response = Error()
+                response.set_code("ID NOT MATCHED")
+                response.set_name("Username already existed")
+                return response
+            else:
+                success_obj=Success()
+                success_obj.set_message(SuccessMessage.DELETE_MESSAGE)
+                success_obj.set_status(SuccessStatus.SUCCESS)
+                return success_obj
+
+    def device_list(self):
+        data = Device.objects.all()
+        if len(data) == 0:
+            response = Error()
+            response.set_code("No Records in Operator")
+            response.set_name("Username already existed")
+            return response
+        else:
+            demo_list=Demo_List()
+            for id_obj in data:
+                temp_response = device_response()
+                temp_response.set_device_id(id_obj.device_id)
+                temp_response.set_device_number(id_obj.device_number)
+                temp_response.set_tunnel_size(id_obj.tunnel_size)
+                temp_response.set_device_model(id_obj.device_model)
+                temp_response.set_keyboard_brand(id_obj.keyboard_brand)
+                temp_response.set_location(id_obj.location)
+                temp_response.set_monitor_brand(id_obj.monitor_brand)
+                temp_response.set_software_version(id_obj.software_version)
+                temp_response.set_status(id_obj.status)
+                demo_list.append(temp_response)
+            return demo_list
 
 
 class Operator_service:
@@ -111,40 +143,29 @@ class Operator_service:
         temp_response.set_email_address(operator_obj.email_address)
         temp_response.set_phone(operator_obj.phone)
         return temp_response
-    def fetch_operator(self, vys_page, first_name):
-        try:
-            condition = Q(status=1)
-            if first_name != " " and first_name != None:
-                condition &= Q(first_name=first_name)
-            obj = Operator.objects.filter(condition)[
-                  vys_page.get_offset():vys_page.get_query_limit()]
 
-            list_length = len(obj)
-            pro_list = Demo_List()
-            if list_length <= 0:
-                return pro_list
-            else:
-
-                for i in obj:
-                    temp_response = Operator_response()
-                    temp_response.set_operator_id(i.operator_id)
-                    temp_response.set_first_name(i.first_name)
-                    temp_response.set_last_name(i.last_name)
-                    temp_response.set_company(i.company)
-                    temp_response.set_employee_id(i.employee_id)
-                    temp_response.set_email_address(i.email_address)
-                    temp_response.set_phone(i.phone)
-
-                    pro_list.append(temp_response)
-                vpage = DemoPaginator(obj, vys_page.get_index(), 10)
-                pro_list.set_pagination(vpage)
-                return pro_list
-        except Exception as e:
-            error_obj = Error()
-            print(e)
-            # error_obj.set_code(ErrorMessage.INVALID_DATA)
-            error_obj.set_description(str(e))
-            return error_obj
+    def fetch_operator(self, page_number, per_page, first_name):
+        condition = Q()
+        if first_name != None and first_name != "":
+            condition &= Q(first_name__icontains=first_name)
+        keywords = Operator.objects.filter(condition).values('operator_id', 'first_name', 'last_name', 'company','employee_id','email_address','phone','status')
+        count = Operator.objects.count()
+        paginator = Paginator(keywords, per_page)
+        data = []
+        page_obj = paginator.get_page(page_number)
+        for kw in page_obj.object_list:
+            data.append({"operator_id": kw["operator_id"], "first_name": kw["first_name"], "last_name": kw["last_name"],"company":kw["company"],
+                         "status": kw["status"],"employee_id":kw["employee_id"],"email_address":kw["email_address"],"phone":kw["phone"]})
+        payload = {
+            "page": {
+                "current": page_obj.number,
+                "has_next": page_obj.has_next(),
+                "has_previous": page_obj.has_previous(),
+                "count": count
+            },
+            "data": data
+        }
+        return JsonResponse(payload)
 
     def operator_get(self, operator_id):
         id_obj = Operator.objects.get(operator_id=operator_id)
@@ -158,18 +179,48 @@ class Operator_service:
         temp_response.set_phone(id_obj.phone)
         return temp_response
 
-    def modification_operator(self,operator_id,status):
-        modification_obj = Operator.objects.filter(operator_id=operator_id).update(status=status)
-        if modification_obj == 0:
-            response = Error()
-            response.set_code("ID NOT MATCHED")
-            # response.set_name("Username already existed")
-            return response
-        else:
+    def modification_operator(self,operator_id,status,Flag):
+        if Flag==True:
+            modification_obj = Operator.objects.get(operator_id=operator_id).delete()
             success_obj = Success()
             success_obj.set_message(SuccessMessage.DELETE_MESSAGE)
             success_obj.set_status(SuccessStatus.SUCCESS)
             return success_obj
+        else:
+            modification_obj = Operator.objects.filter(operator_id=operator_id).update(status=status)
+            if modification_obj == 0:
+                response = Error()
+                response.set_code("ID NOT MATCHED")
+                # response.set_name("Username already existed")
+                return response
+            else:
+                success_obj = Success()
+                success_obj.set_message(SuccessMessage.DELETE_MESSAGE)
+                success_obj.set_status(SuccessStatus.SUCCESS)
+                return success_obj
+
+
+    def operator_list(self):
+        id_obj = Operator.objects.all()
+        if len(id_obj)==0:
+            response = Error()
+            response.set_code("No Records in Operator")
+            response.set_name("Username already existed")
+            return response
+        else:
+
+            list_operator=Demo_List()
+            for id_obj in id_obj:
+                temp_response = Operator_response()
+                temp_response.set_operator_id(id_obj.operator_id)
+                temp_response.set_first_name(id_obj.first_name)
+                temp_response.set_last_name(id_obj.last_name)
+                temp_response.set_company(id_obj.company)
+                temp_response.set_employee_id(id_obj.employee_id)
+                temp_response.set_email_address(id_obj.email_address)
+                temp_response.set_phone(id_obj.phone)
+                list_operator.append(temp_response)
+            return list_operator
 
 
 class ECAC_service:
@@ -195,46 +246,31 @@ class ECAC_service:
         temp_response.set_test_5(ecac_obj.test_5)
         return temp_response
 
-    def fetch_ecac(self, vys_page, test_view):
-        try:
-            condition = Q(status=1)
-            if test_view != " " and test_view != None:
-                condition &= Q(test_view=test_view)
-            obj = ECAC.objects.filter(condition)[
-                  vys_page.get_offset():vys_page.get_query_limit()]
-
-            list_length = len(obj)
-            pro_list = Demo_List()
-            if list_length <= 0:
-                return pro_list
-            else:
-
-                for i in obj:
-                    temp_response = ECAC_response()
-                    temp_response.set_operator_id(i.operator_id)
-                    temp_response.set_device_id(i.device_id)
-                    temp_response.set_ecac_id(i.ecac_id)
-                    temp_response.set_position(i.position)
-                    temp_response.set_test_date(str(i.test_date))
-                    temp_response.set_test_time(str(i.test_time))
-                    temp_response.set_test_view(i.test_view)
-                    temp_response.set_test1_test2(i.test_1test_2)
-                    temp_response.set_test3(i.test_3)
-                    temp_response.set_test4a(i.test_4a)
-                    temp_response.set_test4b(i.test_4b)
-                    temp_response.set_test_5(i.test_5)
-
-
-                    pro_list.append(temp_response)
-                vpage = DemoPaginator(obj, vys_page.get_index(), 10)
-                pro_list.set_pagination(vpage)
-                return pro_list
-        except Exception as e:
-            error_obj = Error()
-            print(e)
-            # error_obj.set_code(ErrorMessage.INVALID_DATA)
-            error_obj.set_description(str(e))
-            return error_obj
+    def fetch_ecac(self, page_number, per_page, test_view):
+        condition = Q()
+        if test_view != None and test_view != "":
+            condition &= Q(test_view__icontains=test_view)
+        keywords = ECAC.objects.filter(condition).values('operator_id', 'device_id', 'ecac_id', 'position',
+                                                             'test_date', 'test_time', 'test_view', 'status','test_1test_2','test_3','test_4a','test_4b','test_5')
+        count = ECAC.objects.count()
+        paginator = Paginator(keywords, per_page)
+        data = []
+        page_obj = paginator.get_page(page_number)
+        for kw in page_obj.object_list:
+            data.append({"operator_id": kw["operator_id"], "device_id": kw["device_id"], "ecac_id": kw["ecac_id"],
+                         "position": kw["position"],
+                         "test_date": kw["test_date"], "test_time": kw["test_time"], "test_view": kw["test_view"],
+                         "status": kw["status"],"test_1test_2": kw["test_1test_2"],"test_3": kw["test_3"],"test_4a": kw["test_4a"],"test_4b": kw["test_4b"],"test_5": kw["test_5"]})
+        payload = {
+            "page": {
+                "current": page_obj.number,
+                "has_next": page_obj.has_next(),
+                "has_previous": page_obj.has_previous(),
+                "count": count
+            },
+            "data": data
+        }
+        return JsonResponse(payload)
 
     def ecac_get(self, ecac_id):
         id_obj = ECAC.objects.get(ecac_id=ecac_id)

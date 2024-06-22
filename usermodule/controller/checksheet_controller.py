@@ -29,7 +29,7 @@ def checksheet_create(request):
         checksheet_data = json.loads(request.body)
         checksheet_obj = ControlSheet_request(checksheet_data)
         checksheet_service = Controll_service()
-        resp_obj = checksheet_service.create_Controll(checksheet_obj,emp_id)
+        resp_obj = checksheet_service.create_Controll(checksheet_obj)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
         return response
 
@@ -73,7 +73,7 @@ def checkrole_create(request):
         checkrole_data = json.loads(request.body)
         checkrole_obj = ControlSheet_request(checkrole_data)
         checksheet_service = checkrule_service()
-        resp_obj = checksheet_service.create_checkrule(checkrole_obj,emp_id)
+        resp_obj = checksheet_service.create_checkrule(checkrole_obj)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
         return response
 
@@ -164,19 +164,18 @@ def shiftdetails_create(request):
         img=request.FILES["file"]
         shiftdetails_obj = ShiftDetail_request(shiftdetails_data)
         Shiftdetails_service = shiftdetails_service()
-        resp_obj = Shiftdetails_service.create_shiftdetails(shiftdetails_obj,emp_id,img)
+        resp_obj = Shiftdetails_service.create_shiftdetails(shiftdetails_obj,img)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
         return response
 
     if request.method == 'GET':
-        page = request.GET.get('page', 1)
-        page = int(page)
+        page_number = request.GET.get('page', 1)
+        per_page = request.GET.get("limit", 10)
         supervisor = request.GET.get('supervisor')
-        vys_page = Page_view(page, 10)
         service = shiftdetails_service()
-        resp_obj = service.fetch_shiftdetails(vys_page, supervisor)
-        response = HttpResponse(resp_obj.get(), content_type="application/json")
-        return response
+        resp_obj = service.fetch_shiftdetails(page_number,per_page, supervisor)
+        # response = HttpResponse(resp_obj.get(), content_type="application/json")
+        return resp_obj
 
 
 @csrf_exempt

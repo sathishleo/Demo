@@ -325,41 +325,35 @@ class shiftdetails_service:
         temp_response.set_status(ShiftDetails_obj.status)
         return temp_response
 
-    def fetch_shiftdetails(self, vys_page, supervisor):
-        try:
-            condition = Q(status=1)
-            if supervisor != " " and supervisor != None:
-                condition &= Q(supervisor=supervisor)
-            obj = ShiftDetails.objects.filter(condition)[
-                  vys_page.get_offset():vys_page.get_query_limit()]
+    def fetch_shiftdetails(self, page_number, per_page, supervisor):
 
-            list_length = len(obj)
-            pro_list = Demo_List()
-            if list_length <= 0:
-                return pro_list
-            else:
-
-                for i in obj:
-                    temp_response = ShiftDetail_response()
-                    temp_response.set_shift_details_id(i.shift_details_id)
-                    temp_response.set_shift_date(str(i.shift_date))
-                    temp_response.set_start_time(str(i.start_time))
-                    temp_response.set_end_time(str(i.end_time))
-                    temp_response.set_scan_count(i.scan_count)
-                    temp_response.set_supervisor(i.supervisor)
-                    temp_response.set_remark(i.remark)
-                    temp_response.set_status(i.status)
-
-                    pro_list.append(temp_response)
-                vpage = DemoPaginator(obj, vys_page.get_index(), 10)
-                pro_list.set_pagination(vpage)
-                return pro_list
-        except Exception as e:
-            error_obj = Error()
-            print(e)
-            # error_obj.set_code(ErrorMessage.INVALID_DATA)
-            error_obj.set_description(str(e))
-            return error_obj
+        # keywords = Product.objects.filter(
+        #     name__icontains=name
+        # )
+        # keywords = Product.objects.filter(
+        #     name__icontains=name
+        # ).values('name','code','Category__name')
+        condition = Q()
+        if supervisor != None and supervisor != "":
+            condition &= Q(supervisor=supervisor)
+        keywords = ShiftDetails.objects.filter(condition).values('shift_details_id', 'shift_date', 'start_time', 'end_time','scan_count','supervisor','remark','status')
+        count = ShiftDetails.objects.count()
+        paginator = Paginator(keywords, per_page)
+        data = []
+        page_obj = paginator.get_page(page_number)
+        for kw in page_obj.object_list:
+            data.append({"shift_details_id": kw["shift_details_id"], "shift_date": kw["shift_date"], "start_time": kw["start_time"],"end_time":kw["end_time"],
+                         "status": kw["status"],"scan_count":kw["scan_count"],"supervisor":kw["supervisor"],"remark":kw["remark"]})
+        payload = {
+            "page": {
+                "current": page_obj.number,
+                "has_next": page_obj.has_next(),
+                "has_previous": page_obj.has_previous(),
+                "count": count
+            },
+            "data": data
+        }
+        return JsonResponse(payload)
 
     def shiftdetails_get(self, shift_details_id):
         id_obj = ShiftDetails.objects.get(shift_details_id=shift_details_id)
