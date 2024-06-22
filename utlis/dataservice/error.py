@@ -5,6 +5,7 @@ class Error:
     code = None
     description = None
     errorcode=None
+    name=None
     def __init__(self):
         pass
 
@@ -22,6 +23,8 @@ class Error:
 
     def get_description(self):
         return self.description
+    def set_name(self, name):
+        self.name = name
 
     def get(self):
         return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=4)
