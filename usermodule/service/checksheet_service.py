@@ -457,27 +457,33 @@ class dropdown_service:
                 success_obj.set_status(SuccessStatus.SUCCESS)
                 return success_obj
 
-    def fetch_dropdown(self, page_number, per_page, list_type):
+    def fetch_dropdown(self, page_number, per_page, list_type,search):
+        if search!=None and search!="":
+            keywords = DropDown.objects.filter(
+                Q(list_item__icontains=search) |
+                Q(list_type__icontains=search)
 
-        condition=Q()
-        if list_type!=None and list_type!="":
-            condition&=Q(list_type=list_type)
-        keywords = DropDown.objects.filter(condition).values('drop_down_id','list_item' ,'list_type','status')
-        count=DropDown.objects.count()
-        paginator = Paginator(keywords, per_page)
-        data=[]
-        page_obj = paginator.get_page(page_number)
-        for kw in page_obj.object_list:
-            data.append({"drop_down_id": kw["drop_down_id"],"list_item":kw["list_item"],"list_type":kw["list_type"],"status":kw["status"]})
+            ).values('drop_down_id','list_item' ,'list_type','status')
+        else:
+            condition=Q()
+            if list_type!=None and list_type!="":
+                condition&=Q(list_type=list_type)
+            keywords = DropDown.objects.filter(condition).values('drop_down_id','list_item' ,'list_type','status')
+            count=DropDown.objects.count()
+            paginator = Paginator(keywords, per_page)
+            data=[]
+            page_obj = paginator.get_page(page_number)
+            for kw in page_obj.object_list:
+                data.append({"drop_down_id": kw["drop_down_id"],"list_item":kw["list_item"],"list_type":kw["list_type"],"status":kw["status"]})
 
-        payload = {
-            "page": {
-                "current": page_obj.number,
-                "has_next": page_obj.has_next(),
-                "has_previous": page_obj.has_previous(),
-                "count":count
-            },
-            "data": data
-        }
-        return JsonResponse(payload)
+            payload = {
+                "page": {
+                    "current": page_obj.number,
+                    "has_next": page_obj.has_next(),
+                    "has_previous": page_obj.has_previous(),
+                    "count":count
+                },
+                "data": data
+            }
+            return JsonResponse(payload)
 

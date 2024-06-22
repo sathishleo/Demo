@@ -32,40 +32,7 @@ class deviceservice:
         temp_response.set_status(device_obj.status)
         return temp_response
 
-    def fetch_device(self,vys_page, device_model):
-        try:
-            condition=Q(status=1)
-            if device_model!=" " and device_model!=None:
-                condition&=Q(device_model=device_model)
-            obj = Device.objects.filter(condition)[
-                 vys_page.get_offset():vys_page.get_query_limit()]
 
-            list_length = len(obj)
-            pro_list = Demo_List()
-            if list_length <= 0:
-                return pro_list
-            else:
-
-                for i in obj:
-                    temp_response = device_response()
-                    temp_response.set_device_id(i.device_id)
-                    temp_response.set_device_number(i.device_number)
-                    temp_response.set_tunnel_size(i.tunnel_size)
-                    temp_response.set_device_model(i.device_model)
-                    temp_response.set_keyboard_brand(i.keyboard_brand)
-                    temp_response.set_location(i.location)
-                    temp_response.set_monitor_brand(i.monitor_brand)
-                    temp_response.set_software_version(i.software_version)
-                    temp_response.set_status(i.status)
-                    pro_list.append(temp_response)
-                vpage = DemoPaginator(obj, vys_page.get_index(), 10)
-                pro_list.set_pagination(vpage)
-                return pro_list
-        except Exception as e:
-            error_obj = Error()
-            print(e)
-            error_obj.set_description(str(e))
-            return error_obj
     def device_get(self,device_id):
         id_obj=Device.objects.get(device_id=device_id)
         temp_response = device_response()
@@ -80,6 +47,41 @@ class deviceservice:
         temp_response.set_status(id_obj.status)
         return temp_response
 
+    def fetch_device(self,  page_number, per_page, device_model,query_text):
+        if query_text == None and query_text == "":
+            keywords = Device.objects.filter(
+                Q(device_model__icontains=query_text) |
+                Q(device_number__icontains=query_text) |
+                Q(monitor_brand__icontains=query_text)).values('device_id', 'device_model', 'device_number', 'tunnel_size', 'status',
+                     'monitor_brand', 'location', 'software_version', 'keyboard_brand')
+        else:
+            condition = Q()
+            if device_model != None and device_model != "":
+                condition &= Q(device_model__icontains=device_model)
+            keywords = Device.objects.filter(condition).values('device_id', 'device_model', 'device_number',
+                                                               'tunnel_size', 'status',
+                                                                              'monitor_brand', 'location',
+                                                               'software_version', 'keyboard_brand')
+
+        count = Device.objects.count()
+        paginator = Paginator(keywords, per_page)
+        data = []
+        page_obj = paginator.get_page(page_number)
+        for kw in page_obj.object_list:
+            data.append({"device_id": kw["device_id"], "device_model": kw["device_model"], "device_number": kw["device_number"],
+                         "tunnel_size": kw["tunnel_size"],
+                         "status": kw["status"], "monitor_brand": kw["monitor_brand"], "location": kw["location"],
+                         "keyboard_brand": kw["keyboard_brand"]  ,"software_version": kw["software_version"]})
+        payload = {
+            "page": {
+                "current": page_obj.number,
+                "has_next": page_obj.has_next(),
+                "has_previous": page_obj.has_previous(),
+                "count": count
+            },
+            "data": data
+        }
+        return JsonResponse(payload)
 
     def modification_device(self,device_id,status,Flag):
         if Flag =="DELETE":
@@ -102,36 +104,6 @@ class deviceservice:
                 success_obj.set_status(SuccessStatus.SUCCESS)
                 return success_obj
 
-    def device_list(self, query_text):
-        demo_list = Demo_List()  # Initialize the Demo_List instance
-        data = Device.objects.filter(
-            Q(device_model__icontains=query_text) |
-            Q(device_number__icontains=query_text) |
-            Q(monitor_brand__icontains=query_text) |
-            Q(keyboard_brand__icontains=query_text)
-        )
-
-        if len(data) == 0:  # Check if no records are found
-            response = Error()
-            response.set_code("No Records in Operator")  # Set error code
-            response.set_name("already existed")  # Set error message
-            return response
-        else:
-            for id_obj in data:  # Iterate through the filtered device records
-                temp_response = device_response()  # Create a new device_response instance
-                # Set the fields of temp_response using the device record
-                temp_response.set_device_id(id_obj.device_id)
-                temp_response.set_device_number(id_obj.device_number)
-                temp_response.set_tunnel_size(id_obj.tunnel_size)
-                temp_response.set_device_model(id_obj.device_model)
-                temp_response.set_keyboard_brand(id_obj.keyboard_brand)
-                temp_response.set_location(id_obj.location)
-                temp_response.set_monitor_brand(id_obj.monitor_brand)
-                temp_response.set_software_version(id_obj.software_version)
-                temp_response.set_status(id_obj.status)
-                demo_list.append(temp_response)  # Append the response to the list
-            return demo_list  # Return the list of device responses
-
 
 class Operator_service:
 
@@ -151,11 +123,22 @@ class Operator_service:
         temp_response.set_phone(operator_obj.phone)
         return temp_response
 
-    def fetch_operator(self, page_number, per_page, first_name):
-        condition = Q()
-        if first_name != None and first_name != "":
-            condition &= Q(first_name__icontains=first_name)
-        keywords = Operator.objects.filter(condition).values('operator_id', 'first_name', 'last_name', 'company','employee_id','email_address','phone','status')
+    def fetch_operator(self, page_number, per_page, first_name,query_text):
+
+        if query_text==None and query_text=="" :
+            keywords = Operator.objects.filter(
+                Q(first_name__icontains=query_text) |
+                Q(last_name__icontains=query_text) |
+                Q(company__icontains=query_text)
+            ).values('operator_id', 'first_name', 'last_name', 'company', 'employee_id', 'email_address', 'phone',
+                     'status')
+        else:
+
+            condition = Q()
+            if first_name != None and first_name != "":
+                condition &= Q(first_name__icontains=first_name)
+            keywords = Operator.objects.filter(condition).values('operator_id', 'first_name', 'last_name', 'company',
+                                                                 'employee_id', 'email_address', 'phone', 'status')
         count = Operator.objects.count()
         paginator = Paginator(keywords, per_page)
         data = []
@@ -205,36 +188,6 @@ class Operator_service:
                 success_obj.set_message(SuccessMessage.DELETE_MESSAGE)
                 success_obj.set_status(SuccessStatus.SUCCESS)
                 return success_obj
-
-
-    def operator_list(self,query_text):
-        demo_list = Demo_List()  # Initialize the Demo_List instance
-        data = Device.objects.filter(
-            Q(device_model__icontains=query_text) |
-            Q(device_number__icontains=query_text) |
-            Q(monitor_brand__icontains=query_text) |
-            Q(keyboard_brand__icontains=query_text)
-        )
-
-        if len(data) == 0:  # Check if no records are found
-            response = Error()
-            response.set_code("No Records in Operator")  # Set error code
-            response.set_name("already existed")  # Set error message
-            return response
-        else:  # Create an instance of Demo_List
-            for operator in data:  # Iterate through each operator record
-                temp_response = Operator_response()  # Create a new Operator_response instance
-                # Set the fields of temp_response using the operator record
-                temp_response.set_operator_id(operator.operator_id)
-                temp_response.set_first_name(operator.first_name)
-                temp_response.set_last_name(operator.last_name)
-                temp_response.set_company(operator.company)
-                temp_response.set_employee_id(operator.employee_id)
-                temp_response.set_email_address(operator.email_address)
-                temp_response.set_phone(operator.phone)
-                demo_list.append(temp_response)  # Append the response to the list
-            return demo_list  # Return the list of operator responses
-
 
 class ECAC_service:
 
