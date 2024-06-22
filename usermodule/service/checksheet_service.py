@@ -393,8 +393,8 @@ class dropdown_service:
         if request_obj.get_drop_down_id() is  None:
             DropDown_obj = DropDown.objects.create(list_item=request_obj.get_list_item(),list_type=request_obj.get_list_type())
         else:
-            DropDown_obj = DropDown.objects.filter(drop_down_id=request_obj.get_id()).update(list_item=request_obj.get_list_item(),list_type=request_obj.get_list_type(),updated_date=now)
-            DropDown_obj = DropDown.objects.get(drop_down_id=request_obj.get_id())
+            DropDown_obj = DropDown.objects.filter(drop_down_id=request_obj.get_drop_down_id()).update(list_item=request_obj.get_list_item(),list_type=request_obj.get_list_type(),updated_date=now)
+            DropDown_obj = DropDown.objects.get(drop_down_id=request_obj.get_drop_down_id())
         temp_response = DropDown_response()
         temp_response.set_drop_down_id(DropDown_obj.drop_down_id)
         temp_response.set_list_item(DropDown_obj.list_item)
