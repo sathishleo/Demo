@@ -29,14 +29,28 @@ class Controll_service:
         temp_response.set_check_date(str(Controll_obj.check_date))
         return temp_response
 
-    def fetch_Controll(self, page_number, per_page, control_operator_id, query_text):
-        if query_text != None and query_text != "":
+    def fetch_Controll(self, page_number,per_page, control_operator_id,search,location,company,device_id,operator_id,start_date,end_date):
+        if search != None and search != "":
             keywords = ControlSheet.objects.filter(
-                Q(device_id=query_text)|
-                Q(operator_id=query_text)
+                Q(device_id=search)|
+                Q(operator_id=search)
             ).values('device_id', 'control_sheet_id', 'control_operator_id', 'check_date','status')
         else:
             condition = Q()
+            if control_operator_id != None and control_operator_id != "":
+                condition &= Q(control_operator_id=int(control_operator_id))
+            if location != None and location != "":
+                condition &= Q(device__location=location)
+            if company != None and company != "":
+                condition &= Q(operator__company=company)
+            if device_id != None and device_id != "":
+                condition &= Q(device_id=int(device_id))
+            if operator_id != None and operator_id != "":
+                condition &= Q(operator_id=int(operator_id))
+            if start_date != None and start_date != "" and end_date != None and end_date != "" :
+                condition &= Q(created_date__range=[start_date,end_date])
+            if start_date != None and start_date != "":
+                condition &= Q(created_date=start_date)
             if control_operator_id != None and control_operator_id != "":
                 condition &= Q(control_operator_id=int(control_operator_id))
             keywords = ControlSheet.objects.filter(condition).values('device_id', 'control_sheet_id', 'control_operator_id', 'check_date','status')
@@ -97,7 +111,6 @@ class Controll_service:
         temp_response.set_control_operator_id(id_obj.control_operator.operator_id)
         temp_response.set_control_sheet_id(id_obj.control_sheet_id)
         temp_response.set_check_date(str(id_obj.check_date))
-        temp_response.set_remark(id_obj.remark)
 
         return temp_response
 
@@ -169,7 +182,7 @@ class checkrule_service:
         return temp_response
 
     def controllsheet_get(self, control_sheet_id):
-        filter_obj = CheckRule.objects.get(control_sheet_id=control_sheet_id)
+        filter_obj = CheckRule.objects.filter(control_sheet_id=control_sheet_id)
         temp_response = CheckRule_response()
         list_obj=Demo_List()
         for id_obj in filter_obj:
@@ -238,6 +251,7 @@ class scandetails_service:
         temp_response.set_scan_date(str(ScanDetails_obj.scan_date))
         temp_response.set_start_time(str(ScanDetails_obj.start_time))
         temp_response.set_end_time(str(ScanDetails_obj.end_time))
+        temp_response.operator_name=(ScanDetails_obj.operator.first_name)
         return temp_response
 
     # def fetch_scandetails(self, vys_page, shift_details):
@@ -275,17 +289,35 @@ class scandetails_service:
     #         error_obj.set_description(str(e))
     #         return error_obj
 
-    def fetch_ScanDetails(self, page_number, per_page, shift_details, query_text):
+    def fetch_ScanDetails(self, page_number, per_page, shift_details, query_text,company,device_id,operator_id,start_date,end_date,start_time,end_time,supervisor_name):
         if query_text != None and query_text != "":
             keywords = ScanDetails.objects.filter(
                 Q(device_id=query_text)|
                 Q(operator_id=query_text)
-            ).values('scan_details_id', 'device_id', 'operator_id', 'scan_date', 'start_time', 'end_time','shift_details','status')
+            ).values('scan_details_id', 'device_id', 'operator_id', 'scan_date', 'start_time', 'end_time','shift_details','status','operator__first_name')
         else:
             condition = Q()
             if shift_details != None and shift_details != "":
                 condition &= Q(shift_details_id=int(shift_details))
-            keywords = ScanDetails.objects.filter(condition).values('scan_details_id', 'device_id', 'operator_id', 'scan_date', 'start_time', 'end_time','shift_details','status')
+            if company != None and company != "":
+                condition &= Q(operator__company=company)
+            if device_id != None and device_id != "":
+                condition &= Q(device_id=int(device_id))
+            if operator_id != None and operator_id != "":
+                condition &= Q(operator_id=int(operator_id))
+            if start_date != None and start_date != "":
+                condition &= Q(scan_date=start_date)
+            if end_date != None and end_date != "":
+                condition &= Q(scan_date=end_date)
+            if start_time != None and start_time != "":
+                condition &= Q(start_time=start_time)
+            if end_time != None and end_time != "":
+                condition &= Q(end_time=end_time)
+
+
+            if shift_details != None and shift_details != "":
+                condition &= Q(shift_details_id=int(shift_details))
+            keywords = ScanDetails.objects.filter(condition).values('scan_details_id', 'device_id', 'operator_id', 'scan_date', 'start_time', 'end_time','shift_details','status','operator__first_name')
         count = ScanDetails.objects.count()
         paginator = Paginator(keywords, per_page)
         data = []
@@ -296,6 +328,7 @@ class scandetails_service:
                          "start_time": str(kw["start_time"]),
                          "shift_details": kw["shift_details"],
                          "end_time": str(kw["end_time"]),
+                         "operator_name": kw["operator__first_name"],
                          "status": kw["status"]})
         payload = {
             "page": {

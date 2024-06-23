@@ -43,10 +43,17 @@ def checksheet_create(request):
         page_number = request.GET.get('page', 1)
         per_page = request.GET.get('limit', 10)
         control_operator_id = request.GET.get('control_operator_id')
+        search = request.GET.get('search')
+        location = request.GET.get('location')
+        company = request.GET.get('company')
+        device_id = request.GET.get('device_id')
+        operator_id = request.GET.get('operator_id')
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
         service = Controll_service()
-        # resp_obj = service.fetch_Controll(vys_page, control_operator_id)
+        resp_obj = service.fetch_Controll(page_number,per_page, control_operator_id,search,location,company,device_id,operator_id,start_date,end_date)
         # response = HttpResponse(resp_obj.get(), content_type="application/json")
-        # return response
+        return resp_obj
 
 
 @csrf_exempt
@@ -92,6 +99,17 @@ def checkrole_create(request):
         response = HttpResponse(resp_obj.get(), content_type="application/json")
         return response
 
+@csrf_exempt
+@api_view(['POST', 'GET'])
+# @authentication_classes([Authentication])
+# @permission_classes([IsAuthenticated,Permission])
+def child_check_rule(request,control_sheet_id):
+    if request.method == 'GET':
+        service = checkrule_service()
+        resp_obj = service.controllsheet_get(control_sheet_id)
+        response = HttpResponse(resp_obj.get(), content_type="application/json")
+        return response
+
 
 @csrf_exempt
 @api_view(['GET', 'DELETE'])
@@ -133,8 +151,16 @@ def scandetails_create(request):
         per_page = request.GET.get('limit', 10)
         shift_details = request.GET.get('shift_details')
         search = request.GET.get('search')
+        company = request.GET.get('company')
+        device_id = request.GET.get('device_id')
+        operator_id = request.GET.get('operator_id')
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+        start_time = request.GET.get('start_time')
+        end_time = request.GET.get('end_time')
+        supervisor_name = request.GET.get('supervisor_name')
         service = scandetails_service()
-        resp_obj = service.fetch_ScanDetails( page_number, per_page, shift_details, search)
+        resp_obj = service.fetch_ScanDetails( page_number, per_page, shift_details, search,company,device_id,operator_id,start_date,end_date,start_time,end_time,supervisor_name)
         # response = HttpResponse(resp_obj.get(), content_type="application/json")
         return resp_obj
 

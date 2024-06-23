@@ -24,6 +24,7 @@ urlpatterns=[
     path('shiftmaintaince/<time_maintenance_id>', Maintaince_controller.view_shiftmaintaince, name='view_shiftmaintaince'),
     path('PauseDetails', Maintaince_controller.create_PauseDetails, name='create_scanmaintaince'),
     path('PauseDetails/<pause_details_id>', Maintaince_controller.view_PauseDetails, name='view_scanmaintaince'),
+    path('child_check_rule/<control_sheet_id>', checksheet_controller.child_check_rule, name='view_scanmaintaince'),
     # path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     # path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 

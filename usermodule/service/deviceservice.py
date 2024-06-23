@@ -212,7 +212,7 @@ class ECAC_service:
         temp_response.set_test_5(ecac_obj.test_5)
         return temp_response
 
-    def fetch_ecac(self, page_number, per_page, test_view,query_text):
+    def fetch_ecac(self, page_number, per_page, test_view,query_text,start_date,end_date,start_time,end_time,device_id,tunnel_size,device_model,software_version,operator_id,location,company,position):
         if query_text==None and query_text=="" :
             keywords = ECAC.objects.filter(
                 Q(test_view__icontains=query_text) |
@@ -224,6 +224,34 @@ class ECAC_service:
             condition = Q()
             if test_view != None and test_view != "":
                 condition &= Q(test_view__icontains=test_view)
+            if start_date != None and start_date != "":
+                condition &= Q(test_date__icontains=start_date)
+            if end_date != None and end_date != "":
+                condition &= Q(test_date__icontains=end_date)
+            if start_time != None and start_time != "":
+                condition &= Q(test_time__icontains=start_time)
+            if end_time != None and end_time != "":
+                condition &= Q(test_view__icontains=end_time)
+            if device_id != None and device_id != "":
+                condition &= Q(device_id=device_id)
+            if tunnel_size != None and tunnel_size != "":
+                condition &= Q(device__tunnel_size=tunnel_size)
+            if device_model != None and device_model != "":
+                condition &= Q(device__device_model=device_model)
+            if software_version != None and software_version != "":
+                condition &= Q(device__software_version=software_version)
+            if operator_id != None and operator_id != "":
+                condition &= Q(operator_id=operator_id)
+            if location != None and location != "":
+                condition &= Q(device__location=location)
+            if company != None and company != "":
+                condition &= Q(operator__company=company)
+            if position != None and position != "":
+                condition &= Q(position=position)
+            if start_time != None and start_time != "" and end_time != None and end_time != "":
+                condition &= Q(test_time__range=[start_time,end_time])
+            if start_date != None and start_date != "" and end_date != None and end_date != "":
+                condition &= Q(test_date__range=[start_date,end_date])
             keywords = ECAC.objects.filter(condition).values('operator_id', 'device_id', 'ecac_id', 'position',
                                                                  'test_date', 'test_time', 'test_view', 'status','test_1test_2','test_3','test_4a','test_4b','test_5')
             count = ECAC.objects.count()

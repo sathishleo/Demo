@@ -150,9 +150,22 @@ def ecac_create(request):
         test_view = request.GET.get('test_view')
         page_number = request.GET.get('page', 1)
         per_page = request.GET.get("limit", 10)
-        search = request.GET.get("search", 10)
+        search = request.GET.get("search")
+        start_date= request.GET.get("search")
+        end_date= request.GET.get("search")
+        start_time= request.GET.get("search")
+        end_time= request.GET.get("search")
+        device_id= request.GET.get("search")
+        tunnel_size= request.GET.get("search")
+        device_model= request.GET.get("search")
+        software_version= request.GET.get("search")
+        operator_id= request.GET.get("search")
+        location= request.GET.get("search")
+        company= request.GET.get("search")
+        position= request.GET.get("search")
+
         service = ECAC_service()
-        resp_obj = service.fetch_ecac(page_number, per_page, test_view,search)
+        resp_obj = service.fetch_ecac(page_number, per_page, test_view,search,start_date,end_date,start_time,end_time,device_id,tunnel_size,device_model,software_version,operator_id,location,company,position)
         return resp_obj
 
 @csrf_exempt
