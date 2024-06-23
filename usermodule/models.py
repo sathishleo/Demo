@@ -76,8 +76,8 @@ class ControlSheet(models.Model):
     status = models.IntegerField(default=1)
     created_by = models.IntegerField(null=True)
     created_date = models.DateTimeField(default=now)
-    updated_by = models.IntegerField()
-    updated_date = models.DateTimeField()
+    updated_by = models.IntegerField(null=True)
+    updated_date = models.DateTimeField(null=True)
 
 class CheckRule(models.Model):
     checkrule_id=models.AutoField(primary_key=True)

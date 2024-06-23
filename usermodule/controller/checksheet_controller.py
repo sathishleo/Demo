@@ -26,22 +26,27 @@ def checksheet_create(request):
         # user_id = request.user.id
         # emp_service = Emp_service()
         # emp_id = emp_service.get_empid_from_userid(user_id)
-        checksheet_data = json.loads(request.body)
-        checksheet_obj = ControlSheet_request(checksheet_data)
+        checksheet_data=json.loads(request.body)
+        checksheet_rule=checksheet_data.get("check_role")
+        checksheet_control=checksheet_data.get("controllsheet")
+
+        checksheet_obj = ControlSheet_request(checksheet_control)
+        checkrole_obj = ControlSheet_request(checksheet_rule)
         checksheet_service = Controll_service()
         resp_obj = checksheet_service.create_Controll(checksheet_obj)
+        service = checkrule_service()
+        obj = service.bulk_checkrule(checksheet_rule,resp_obj.control_sheet_id)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
         return response
 
     if request.method == 'GET':
-        page = request.GET.get('page', 1)
-        page = int(page)
+        page_number = request.GET.get('page', 1)
+        per_page = request.GET.get('limit', 10)
         control_operator_id = request.GET.get('control_operator_id')
-        vys_page = Page_view(page, 10)
         service = Controll_service()
-        resp_obj = service.fetch_Controll(vys_page, control_operator_id)
-        response = HttpResponse(resp_obj.get(), content_type="application/json")
-        return response
+        # resp_obj = service.fetch_Controll(vys_page, control_operator_id)
+        # response = HttpResponse(resp_obj.get(), content_type="application/json")
+        # return response
 
 
 @csrf_exempt
@@ -161,7 +166,7 @@ def shiftdetails_create(request):
         # user_id = request.user.id
         # emp_service = Emp_service()
         # emp_id = emp_service.get_empid_from_userid(user_id)
-        shiftdetails_data =json.loads(request.data.dict().get('data'))
+        shiftdetails_data =json.loads(request.body)
         # img=request.FILES["file"]
         shiftdetails_obj = ShiftDetail_request(shiftdetails_data)
         Shiftdetails_service = shiftdetails_service()

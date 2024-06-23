@@ -16,57 +16,85 @@ from utlis.dataservice.success import Success, SuccessMessage, SuccessStatus
 
 class Controll_service:
 
-    def create_Controll(self, request_obj,emp_id):
+    def create_Controll(self, request_obj):
         if request_obj.get_control_sheet_id() is  None:
-            Controll_obj = ControlSheet.objects.create(device_id=request_obj.get_device_id(),control_operator_id=request_obj.get_control_operator_id(),check_date=request_obj.get_check_date(),remark=request_obj.get_remark())
+            Controll_obj = ControlSheet.objects.create(device_id=request_obj.get_device_id(),control_operator_id=request_obj.get_control_operator_id(),check_date=request_obj.get_check_date())
         else:
-            Controll_obj = ControlSheet.objects.filter(control_sheet_id=request_obj.get_control_sheet_id()).update(device_id=request_obj.get_device_id(),control_operator_id=request_obj.get_control_operator_id(),check_date=request_obj.get_check_date(),remark=request_obj.get_remark(),updated_date=now())
+            Controll_obj = ControlSheet.objects.filter(control_sheet_id=request_obj.get_control_sheet_id()).update(device_id=request_obj.get_device_id(),control_operator_id=request_obj.get_control_operator_id(),check_date=request_obj.get_check_date())
             Controll_obj = ControlSheet.objects.get(control_sheet_id=request_obj.get_control_sheet_id())
         temp_response = ControlSheet_response()
         temp_response.set_device_id(Controll_obj.device_id)
-        temp_response.set_control_operator_id(Controll_obj.control_operator)
+        temp_response.set_control_operator_id(Controll_obj.control_operator.operator_id)
         temp_response.set_control_sheet_id(Controll_obj.control_sheet_id)
-        temp_response.set_check_date(Controll_obj.check_date)
-        temp_response.set_remark(Controll_obj.remark)
+        temp_response.set_check_date(str(Controll_obj.check_date))
         return temp_response
 
-    def fetch_Controll(self, vys_page, control_operator_id):
-        try:
-            condition = Q(status=1)
-            if control_operator_id != " " and control_operator_id != None:
-                condition &= Q(control_operator_id=control_operator_id)
-            obj = ControlSheet.objects.filter(condition)[
-                  vys_page.get_offset():vys_page.get_query_limit()]
+    def fetch_Controll(self, page_number, per_page, control_operator_id, query_text):
+        if query_text != None and query_text != "":
+            keywords = ControlSheet.objects.filter(
+                Q(device_id=query_text)|
+                Q(operator_id=query_text)
+            ).values('device_id', 'control_sheet_id', 'control_operator_id', 'check_date','status')
+        else:
+            condition = Q()
+            if control_operator_id != None and control_operator_id != "":
+                condition &= Q(control_operator_id=int(control_operator_id))
+            keywords = ControlSheet.objects.filter(condition).values('device_id', 'control_sheet_id', 'control_operator_id', 'check_date','status')
+        count = ControlSheet.objects.count()
+        paginator = Paginator(keywords, per_page)
+        data = []
+        page_obj = paginator.get_page(page_number)
+        for kw in page_obj.object_list:
+            data.append({"device_id": kw["device_id"], "control_sheet_id": kw["control_sheet_id"], "control_operator_id": kw["control_operator_id"],
+                         "check_date": str(kw["check_date"]),
+                         "status": kw["status"]})
+        payload = {
+            "page": {
+                "current": page_obj.number,
+                "has_next": page_obj.has_next(),
+                "has_previous": page_obj.has_previous(),
+                "count": count
+            },
+            "data": data
+        }
+        return JsonResponse(payload)
 
-            list_length = len(obj)
-            pro_list = Demo_List()
-            if list_length <= 0:
-                return pro_list
-            else:
-
-                for i in obj:
-                    temp_response = ControlSheet_response()
-                    temp_response.set_device_id(i.device_id)
-                    temp_response.set_control_operator_id(i.control_operator)
-                    temp_response.set_control_sheet_id(i.control_sheet_id)
-                    temp_response.set_check_date(str(i.check_date))
-                    temp_response.set_remark(i.remark)
-                    pro_list.append(temp_response)
-                vpage = DemoPaginator(obj, vys_page.get_index(), 10)
-                pro_list.set_pagination(vpage)
-                return pro_list
-        except Exception as e:
-            error_obj = Error()
-            print(e)
-            # error_obj.set_code(ErrorMessage.INVALID_DATA)
-            error_obj.set_description(str(e))
-            return error_obj
+    # def fetch_Controll(self, vys_page, control_operator_id):
+    #     try:
+    #         condition = Q(status=1)
+    #         if control_operator_id != " " and control_operator_id != None:
+    #             condition &= Q(control_operator_id=control_operator_id)
+    #         obj = ControlSheet.objects.filter(condition)[
+    #               vys_page.get_offset():vys_page.get_query_limit()]
+    #
+    #         list_length = len(obj)
+    #         pro_list = Demo_List()
+    #         if list_length <= 0:
+    #             return pro_list
+    #         else:
+    #
+    #             for i in obj:
+    #                 temp_response = ControlSheet_response()
+    #                 temp_response.set_device_id(i.device_id)
+    #                 temp_response.set_control_operator_id(i.control_operator.operator_id)
+    #                 temp_response.set_control_sheet_id(i.control_sheet_id)
+    #                 temp_response.set_check_date(str(i.check_date))
+    #                 pro_list.append(temp_response)
+    #             vpage = DemoPaginator(obj, vys_page.get_index(), 10)
+    #             pro_list.set_pagination(vpage)
+    #             return pro_list
+    #     except Exception as e:
+    #         error_obj = Error()
+    #         print(e)
+    #         # error_obj.set_code(ErrorMessage.INVALID_DATA)
+    #         error_obj.set_description(str(e))
+    #         return error_obj
 
     def Controll_get(self, control_sheet_id):
         id_obj = ControlSheet.objects.get(control_sheet_id=control_sheet_id)
         temp_response = ControlSheet_response()
         temp_response.set_device_id(id_obj.device_id)
-        temp_response.set_control_operator_id(id_obj.control_operator)
+        temp_response.set_control_operator_id(id_obj.control_operator.operator_id)
         temp_response.set_control_sheet_id(id_obj.control_sheet_id)
         temp_response.set_check_date(str(id_obj.check_date))
         temp_response.set_remark(id_obj.remark)
@@ -82,7 +110,7 @@ class Controll_service:
 
 class checkrule_service:
 
-    def create_checkrule(self, request_obj,emp_id):
+    def create_checkrule(self, request_obj):
         if request_obj.get_checkrule_id() is  None:
             Controll_obj = CheckRule.objects.create(rule_id=request_obj.get_rule_id(),control_sheet_id=request_obj.get_control_sheet_id(),rule_choice=request_obj.get_rule_choice(),remark=request_obj.get_remark())
         else:
@@ -140,6 +168,21 @@ class checkrule_service:
 
         return temp_response
 
+    def controllsheet_get(self, control_sheet_id):
+        filter_obj = CheckRule.objects.get(control_sheet_id=control_sheet_id)
+        temp_response = CheckRule_response()
+        list_obj=Demo_List()
+        for id_obj in filter_obj:
+
+            temp_response.set_rule_choice(id_obj.rule_choice)
+            temp_response.set_checkrule_id(id_obj.checkrule_id)
+            temp_response.set_rule_id(id_obj.rule_id)
+            temp_response.set_control_sheet_id(id_obj.control_sheet_id)
+            temp_response.set_remark(id_obj.remark)
+            list_obj.append(temp_response)
+
+        return temp_response
+
     def modification_checkrule(self, checkrule_id, status):
         modification_obj = CheckRule.objects.filter(checkrule_id=checkrule_id).update(status=status)
         if modification_obj == 0:
@@ -152,6 +195,16 @@ class checkrule_service:
             success_obj.set_message(SuccessMessage.DELETE_MESSAGE)
             success_obj.set_status(SuccessStatus.SUCCESS)
             return success_obj
+
+
+    def bulk_checkrule(self, request_obj,control_sheet_id):
+        Controll_obj=[]
+        for i in request_obj:
+            currention_obj = CheckRule(rule_id=i["rule_id"],control_sheet_id=control_sheet_id,
+                                                    rule_choice=i["rule_choice"],
+                                                    remark=i["remark"])
+            Controll_obj.append(currention_obj)
+        obj=CheckRule.objects.bulk_create(Controll_obj)
 
 
 class scandetails_service:
