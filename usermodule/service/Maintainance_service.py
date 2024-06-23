@@ -19,7 +19,7 @@ class TimeMaintenance_service:
             TimeMaintenance_obj = TimeMaintenance.objects.create(time_type=request_obj.get_time_type(),decided_minutes=request_obj.get_decided_minutes())
         else:
             TimeMaintenance_obj = TimeMaintenance.objects.filter(time_maintenance_id=request_obj.get_time_maintenance_id()).update(time_type=request_obj.get_time_type(),decided_minutes=request_obj.get_decided_minutes(),updated_date=now())
-            TimeMaintenance_obj = TimeMaintenance.objects.filter(time_maintenance_id=request_obj.get_time_maintenance_id())
+            TimeMaintenance_obj = TimeMaintenance.objects.get(time_maintenance_id=request_obj.get_time_maintenance_id())
         temp_response = TimeMaintenance_response()
         temp_response.set_time_maintenance_id(TimeMaintenance_obj.time_maintenance_id)
         temp_response.set_time_type(TimeMaintenance_obj.time_type)
