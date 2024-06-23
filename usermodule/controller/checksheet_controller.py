@@ -115,7 +115,7 @@ def scandetails_create(request):
         # user_id = request.user.id
         # emp_service = Emp_service()
         # emp_id = emp_service.get_empid_from_userid(user_id)
-        scandetails_data = json.loads(request.data.dict().get('data'))
+        scandetails_data =json.loads(request.body)
         # img=request.FILES["file"]
         scandetails_obj = ScanDetails_request(scandetails_data)
         Scandetails_service = scandetails_service()
