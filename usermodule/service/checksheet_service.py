@@ -83,7 +83,7 @@ class Controll_service:
 class checkrule_service:
 
     def create_checkrule(self, request_obj,emp_id):
-        if request_obj.get_icheckrule_id() is  None:
+        if request_obj.get_checkrule_id() is  None:
             Controll_obj = CheckRule.objects.create(rule_id=request_obj.get_rule_id(),control_sheet_id=request_obj.get_control_sheet_id(),rule_choice=request_obj.get_rule_choice(),remark=request_obj.get_remark())
         else:
             Controll_obj = CheckRule.objects.filter(checkrule_id=request_obj.get_checkrule_id()).update(rule_id=request_obj.get_rule_id(),control_sheet_id=request_obj.get_control_sheet_id(),rule_choice=request_obj.get_rule_choice(),remark=request_obj.get_remark(),updated_date=now())
@@ -129,8 +129,8 @@ class checkrule_service:
             error_obj.set_description(str(e))
             return error_obj
 
-    def checkrule_get(self, id):
-        id_obj = CheckRule.objects.get(checkrule_id=id)
+    def checkrule_get(self, checkrule_id):
+        id_obj = CheckRule.objects.get(checkrule_id=checkrule_id)
         temp_response = CheckRule_response()
         temp_response.set_rule_choice(id_obj.rule_choice)
         temp_response.set_checkrule_id(id_obj.checkrule_id)
@@ -156,13 +156,13 @@ class checkrule_service:
 
 class scandetails_service:
 
-    def create_scandetails(self, request_obj,img):
+    def create_scandetails(self, request_obj):
         # try:
         if request_obj.get_scan_details_id() is  None:
             obj_validation=self.validation_scan(request_obj.get_operator_id())
 
             if obj_validation==True:
-                ScanDetails_obj = ScanDetails.objects.create(device_id=request_obj.get_device_id(),operator_id=request_obj.get_operator_id(),scan_date=request_obj.get_scan_date(),start_time=request_obj.get_start_time(),end_time=request_obj.get_end_time(),shift_details_id=request_obj.get_shift_details_id(),operator_signature=img)
+                ScanDetails_obj = ScanDetails.objects.create(device_id=request_obj.get_device_id(),operator_id=request_obj.get_operator_id(),scan_date=request_obj.get_scan_date(),start_time=request_obj.get_start_time(),end_time=request_obj.get_end_time(),shift_details_id=request_obj.get_shift_details_id())
                 temp_response = ScanDetails_response()
                 temp_response.set_scan_details_id(ScanDetails_obj.scan_details_id)
                 temp_response.set_device_id(ScanDetails_obj.device_id)
@@ -176,7 +176,7 @@ class scandetails_service:
                 error.set_description("vaild break time")
                 return error
         else:
-            ScanDetails_obj = ScanDetails.objects.filter(scan_details_id=request_obj.get_scan_details_id()).update(device_id=request_obj.get_device_id(),operator_id=request_obj.get_operator_id(),scan_date=request_obj.get_scan_date(),start_time=request_obj.get_start_time(),end_time=request_obj.get_end_time(),shift_details_id=request_obj.get_shift_details_id(),updated_date=now(),operator_signature=img)
+            ScanDetails_obj = ScanDetails.objects.filter(scan_details_id=request_obj.get_scan_details_id()).update(device_id=request_obj.get_device_id(),operator_id=request_obj.get_operator_id(),scan_date=request_obj.get_scan_date(),start_time=request_obj.get_start_time(),end_time=request_obj.get_end_time(),shift_details_id=request_obj.get_shift_details_id(),updated_date=now())
             ScanDetails_obj = ScanDetails.objects.get(scan_details_id=request_obj.get_scan_details_id())
         temp_response = ScanDetails_response()
         temp_response.set_scan_details_id(ScanDetails_obj.scan_details_id)
@@ -368,13 +368,6 @@ class shiftdetails_service:
         return temp_response
 
     def fetch_shiftdetails(self, page_number, per_page, supervisor):
-
-        # keywords = Product.objects.filter(
-        #     name__icontains=name
-        # )
-        # keywords = Product.objects.filter(
-        #     name__icontains=name
-        # ).values('name','code','Category__name')
         condition = Q()
         if supervisor != None and supervisor != "":
             condition &= Q(supervisor=supervisor)
@@ -410,18 +403,26 @@ class shiftdetails_service:
         temp_response.set_status(id_obj.status)
         return temp_response
 
-    def modification_shiftdetails(self, shift_details_id, status):
-        modification_obj = ShiftDetails.objects.filter(shift_details_id=shift_details_id).update(status=status)
-        if modification_obj == 0:
-            response = Error()
-            response.set_code("ID NOT MATCHED")
-            # response.set_name("Username already existed")
-            return response
-        else:
+    def modification_shiftdetails(self, shift_details_id, status,Flag):
+        if Flag=='DELETE':
+            modification_obj = ShiftDetails.objects.get(shift_details_id=shift_details_id).delete()
             success_obj = Success()
             success_obj.set_message(SuccessMessage.DELETE_MESSAGE)
             success_obj.set_status(SuccessStatus.SUCCESS)
             return success_obj
+        else:
+
+            modification_obj = ShiftDetails.objects.filter(shift_details_id=shift_details_id).update(status=status)
+            if modification_obj == 0:
+                response = Error()
+                response.set_code("ID NOT MATCHED")
+                # response.set_name("Username already existed")
+                return response
+            else:
+                success_obj = Success()
+                success_obj.set_message(SuccessMessage.DELETE_MESSAGE)
+                success_obj.set_status(SuccessStatus.SUCCESS)
+                return success_obj
 
 class dropdown_service:
 

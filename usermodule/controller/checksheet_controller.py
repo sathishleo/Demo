@@ -116,10 +116,10 @@ def scandetails_create(request):
         # emp_service = Emp_service()
         # emp_id = emp_service.get_empid_from_userid(user_id)
         scandetails_data = json.loads(request.data.dict().get('data'))
-        img=request.FILES["file"]
+        # img=request.FILES["file"]
         scandetails_obj = ScanDetails_request(scandetails_data)
         Scandetails_service = scandetails_service()
-        resp_obj = Scandetails_service.create_scandetails(scandetails_obj,img)
+        resp_obj = Scandetails_service.create_scandetails(scandetails_obj)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
         return response
 
@@ -165,7 +165,7 @@ def shiftdetails_create(request):
         # img=request.FILES["file"]
         shiftdetails_obj = ShiftDetail_request(shiftdetails_data)
         Shiftdetails_service = shiftdetails_service()
-        resp_obj = Shiftdetails_service.create_shiftdetails(shiftdetails_obj,img)
+        resp_obj = Shiftdetails_service.create_shiftdetails(shiftdetails_obj)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
         return response
 
@@ -192,7 +192,8 @@ def view_shiftdetails(request, shift_details_id):
     elif request.method == 'DELETE':
         service = shiftdetails_service()
         status = request.GET.get('status')
-        resp_obj = service.modification_shiftdetails(shift_details_id, status)
+        Flag = request.GET.get('Flag')
+        resp_obj = service.modification_shiftdetails(shift_details_id, status,Flag)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
         return response
 

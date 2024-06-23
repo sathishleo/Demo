@@ -148,7 +148,7 @@ class TimeMaintenance(models.Model):
     time_maintenance_id=models.AutoField(primary_key=True)
     time_type = models.TextField(null=True)
     decided_minutes = models.IntegerField(null=True)
-    change_date = models.DateField(null=True)
+    change_date = models.DateField(default=now)
     current_status=models.BooleanField(default=True)
     status = models.IntegerField(default=1)
     created_by = models.IntegerField(null=True)

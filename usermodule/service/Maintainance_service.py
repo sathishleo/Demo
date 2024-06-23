@@ -16,9 +16,9 @@ class TimeMaintenance_service:
 
     def create_shiftmaintance(self, request_obj):
         if request_obj.get_time_maintenance_id() is  None:
-            TimeMaintenance_obj = TimeMaintenance.objects.create(time_type=request_obj.get_time_type(),change_date=request_obj.get_change_date(),decided_minutes=request_obj.get_decided_minutes())
+            TimeMaintenance_obj = TimeMaintenance.objects.create(time_type=request_obj.get_time_type(),decided_minutes=request_obj.get_decided_minutes())
         else:
-            TimeMaintenance_obj = TimeMaintenance.objects.filter(time_maintenance_id=request_obj.get_time_maintenance_id()).update(time_type=request_obj.get_time_type(),change_date=request_obj.get_change_date(),decided_minutes=request_obj.get_decided_minutes(),updated_date=now())
+            TimeMaintenance_obj = TimeMaintenance.objects.filter(time_maintenance_id=request_obj.get_time_maintenance_id()).update(time_type=request_obj.get_time_type(),decided_minutes=request_obj.get_decided_minutes(),updated_date=now())
             TimeMaintenance_obj = TimeMaintenance.objects.filter(time_maintenance_id=request_obj.get_time_maintenance_id())
         temp_response = TimeMaintenance_response()
         temp_response.set_time_maintenance_id(TimeMaintenance_obj.time_maintenance_id)
