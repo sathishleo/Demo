@@ -94,8 +94,8 @@ class CheckRule(models.Model):
 class ShiftDetails(models.Model):
     shift_details_id = models.AutoField(primary_key=True)
     shift_date = models.DateField()
-    start_time = models.TimeField()
-    end_time = models.TimeField()
+    start_time = models.TimeField(null=True)
+    end_time = models.TimeField(null=True)
     scan_count = models.IntegerField(null=True)
     supervisor = models.CharField(max_length=75,null=True)
     supervisor_signature = models.ImageField(upload_to='supervisor_sign/')
