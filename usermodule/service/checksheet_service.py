@@ -248,6 +248,7 @@ class scandetails_service:
                 temp_response.set_start_time(ScanDetails_obj.start_time)
                 temp_response.set_end_time(ScanDetails_obj.end_time)
                 temp_response.operator_sign=ScanDetails_obj.operator_sign
+                temp_response.created_date = str(ScanDetails_obj.created_date)
                 return temp_response
             else:
                 error=Error()
@@ -265,6 +266,7 @@ class scandetails_service:
         temp_response.set_end_time(str(ScanDetails_obj.end_time))
         temp_response.operator_name=str(ScanDetails_obj.operator.first_name)+" "+str((ScanDetails_obj.operator.last_name))
         temp_response.operator_sign = ScanDetails_obj.operator_sign
+        temp_response.created_date = str(ScanDetails_obj.created_date)
         return temp_response
 
     # def fetch_scandetails(self, vys_page, shift_details):
@@ -307,7 +309,7 @@ class scandetails_service:
             keywords = ScanDetails.objects.filter(
                 Q(device_id=query_text)|
                 Q(operator_id=query_text)
-            ).values('scan_details_id', 'device_id', 'operator_id', 'scan_date', 'start_time', 'end_time','shift_details','status','operator__first_name','operator__last_name','shift_details__supervisor')
+            ).values('scan_details_id', 'device_id', 'operator_id', 'scan_date', 'start_time', 'end_time','shift_details','status','operator__first_name','operator__last_name','shift_details__supervisor','created_date')
         else:
             condition = Q()
             if company != None and company != "":
@@ -330,14 +332,14 @@ class scandetails_service:
 
             if shift_details != None and shift_details != "":
                 condition &= Q(shift_details_id=int(shift_details))
-            keywords = ScanDetails.objects.filter(condition).values('scan_details_id', 'device_id', 'operator_id', 'scan_date', 'start_time', 'end_time','shift_details','status','operator__first_name','operator__last_name','shift_details__supervisor')
+            keywords = ScanDetails.objects.filter(condition).values('scan_details_id', 'device_id', 'operator_id', 'scan_date', 'start_time', 'end_time','shift_details','status','operator__first_name','operator__last_name','shift_details__supervisor','created_date').order_by("-created_date")
         count = ScanDetails.objects.count()
         paginator = Paginator(keywords, per_page)
         data = []
         page_obj = paginator.get_page(page_number)
         for kw in page_obj.object_list:
             data.append({"scan_details_id": kw["scan_details_id"], "device_id": kw["device_id"], "operator_id": kw["operator_id"],
-                         "scan_date": str(kw["scan_date"]),
+                         "scan_date": str(kw["scan_date"]),"created_date":str(kw["created_date"]),
                          "start_time": str(kw["start_time"]),
                          "shift_details": kw["shift_details"],
                          "end_time": str(kw["end_time"]),
@@ -367,6 +369,8 @@ class scandetails_service:
         temp_response.set_start_time(str(id_obj.start_time))
         temp_response.set_end_time(str(id_obj.end_time))
         temp_response.set_status(id_obj.status)
+        temp_response.operator_sign = id_obj.operator_sign
+        temp_response.created_date = str(id_obj.created_date)
 
         return temp_response
 
