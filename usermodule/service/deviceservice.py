@@ -47,7 +47,7 @@ class deviceservice:
         temp_response.set_status(id_obj.status)
         return temp_response
 
-    def fetch_device(self,  page_number, per_page, device_model,query_text):
+    def fetch_device(self,  page_number, per_page, device_model,query_text,device_number,tunnel_size,monitor_brand,location,software_version,keyboard_brand):
         if query_text == None and query_text == "":
             keywords = Device.objects.filter(
                 Q(device_model__icontains=query_text) |
@@ -58,6 +58,18 @@ class deviceservice:
             condition = Q()
             if device_model != None and device_model != "":
                 condition &= Q(device_model__icontains=device_model)
+            if device_number != None and device_number != "":
+                condition &= Q(device_number__icontains=device_number)
+            if tunnel_size != None and tunnel_size != "":
+                condition &= Q(tunnel_size__icontains=tunnel_size)
+            if monitor_brand != None and monitor_brand != "":
+                condition &= Q(monitor_brand__icontains=monitor_brand)
+            if location != None and location != "":
+                condition &= Q(location__icontains=location)
+            if software_version != None and software_version != "":
+                condition &= Q(software_version__icontains=software_version)
+            if keyboard_brand != None and keyboard_brand != "":
+                condition &= Q(keyboard_brand__icontains=keyboard_brand)
             keywords = Device.objects.filter(condition).values('device_id', 'device_model', 'device_number',
                                                                'tunnel_size', 'status',
                                                                               'monitor_brand', 'location',

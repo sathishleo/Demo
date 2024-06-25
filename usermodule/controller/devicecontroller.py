@@ -42,8 +42,15 @@ def device_create(request):
         per_page = request.GET.get("limit", 10)
         device_model = request.GET.get('device_model')
         search = request.GET.get('search')
+        device_number = request.GET.get('device_number')
+        tunnel_size = request.GET.get('tunnel_size')
+        monitor_brand = request.GET.get('monitor_brand')
+        location = request.GET.get('location')
+        software_version = request.GET.get('software_version')
+        keyboard_brand = request.GET.get('software_version')
+
         service = deviceservice()
-        resp_obj = service.fetch_device( page_number, per_page, device_model,search)
+        resp_obj = service.fetch_device( page_number, per_page, device_model,search, device_number, tunnel_size, monitor_brand, location, software_version, keyboard_brand)
         # response = HttpResponse(resp_obj.get(), content_type="application/json")
         return resp_obj
 
@@ -98,8 +105,14 @@ def operator_create(request):
         per_page = request.GET.get("limit", 10)
         first_name = request.GET.get('first_name')
         search = request.GET.get('search')
+        operator_id = request.GET.get('operator_id')
+        last_name = request.GET.get('last_name')
+        company = request.GET.get('company')
+        employee_id = request.GET.get('employee_id')
+        email_address = request.GET.get('email_address')
+        phone = request.GET.get('phone')
         service = Operator_service()
-        resp_obj = service.fetch_operator(page_number, per_page, first_name,search)
+        resp_obj = service.fetch_operator(page_number, per_page, first_name,search,operator_id,last_name,company,employee_id,email_address,phone)
         return resp_obj
 
 @csrf_exempt
