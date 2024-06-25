@@ -115,6 +115,7 @@ class ScanDetails(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     operator_signature =  models.ImageField(upload_to='operator_signature/')
+    operator_sign =  models.TextField(null=True)
     shift_details = models.ForeignKey(ShiftDetails, on_delete=models.CASCADE)
     status = models.IntegerField(default=1)
     created_by = models.IntegerField(null=True)

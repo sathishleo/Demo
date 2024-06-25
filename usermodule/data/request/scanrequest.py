@@ -8,6 +8,7 @@ class ScanDetails_request:
     operator_signature = None
     remark = None
     shift_details_id = None
+    operator_sign=None
 
     def __init__(self, object):
         if 'scan_details_id' in object:
@@ -28,9 +29,15 @@ class ScanDetails_request:
             self.operator_signature = object["operator_signature"]
         if 'shift_details_id' in object:
             self.shift_details_id = object["shift_details_id"]
+        if 'operator_sign' in object:
+            self.operator_sign = object["operator_sign"]
+
 
     def get_scan_details_id(self):
         return self.scan_details_id
+
+    def get_operator_sign(self):
+        return self.operator_sign
 
     def get_device_id(self):
         return self.device_id

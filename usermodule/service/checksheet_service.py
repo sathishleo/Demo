@@ -239,7 +239,7 @@ class scandetails_service:
             obj_validation=self.validation_scan(request_obj.get_operator_id())
 
             if obj_validation==True:
-                ScanDetails_obj = ScanDetails.objects.create(device_id=request_obj.get_device_id(),operator_id=request_obj.get_operator_id(),scan_date=request_obj.get_scan_date(),start_time=request_obj.get_start_time(),end_time=request_obj.get_end_time(),shift_details_id=request_obj.get_shift_details_id())
+                ScanDetails_obj = ScanDetails.objects.create(device_id=request_obj.get_device_id(),operator_id=request_obj.get_operator_id(),scan_date=request_obj.get_scan_date(),start_time=request_obj.get_start_time(),end_time=request_obj.get_end_time(),shift_details_id=request_obj.get_shift_details_id(),operator_sign=request_obj.get_operator_sign())
                 temp_response = ScanDetails_response()
                 temp_response.set_scan_details_id(ScanDetails_obj.scan_details_id)
                 temp_response.set_device_id(ScanDetails_obj.device_id)
@@ -247,13 +247,14 @@ class scandetails_service:
                 temp_response.set_scan_date(str(ScanDetails_obj.scan_date))
                 temp_response.set_start_time(ScanDetails_obj.start_time)
                 temp_response.set_end_time(ScanDetails_obj.end_time)
+                temp_response.operator_sign=ScanDetails_obj.operator_sign
                 return temp_response
             else:
                 error=Error()
                 error.set_description("vaild break time")
                 return error
         else:
-            ScanDetails_obj = ScanDetails.objects.filter(scan_details_id=request_obj.get_scan_details_id()).update(device_id=request_obj.get_device_id(),operator_id=request_obj.get_operator_id(),scan_date=request_obj.get_scan_date(),start_time=request_obj.get_start_time(),end_time=request_obj.get_end_time(),shift_details_id=request_obj.get_shift_details_id(),updated_date=now())
+            ScanDetails_obj = ScanDetails.objects.filter(scan_details_id=request_obj.get_scan_details_id()).update(device_id=request_obj.get_device_id(),operator_id=request_obj.get_operator_id(),scan_date=request_obj.get_scan_date(),start_time=request_obj.get_start_time(),end_time=request_obj.get_end_time(),shift_details_id=request_obj.get_shift_details_id(),updated_date=now(),operator_sign=request_obj.get_operator_sign())
             ScanDetails_obj = ScanDetails.objects.get(scan_details_id=request_obj.get_scan_details_id())
         temp_response = ScanDetails_response()
         temp_response.set_scan_details_id(ScanDetails_obj.scan_details_id)
@@ -262,7 +263,8 @@ class scandetails_service:
         temp_response.set_scan_date(str(ScanDetails_obj.scan_date))
         temp_response.set_start_time(str(ScanDetails_obj.start_time))
         temp_response.set_end_time(str(ScanDetails_obj.end_time))
-        temp_response.operator_name=(ScanDetails_obj.operator.first_name)
+        temp_response.operator_name=str(ScanDetails_obj.operator.first_name)+" "+str((ScanDetails_obj.operator.last_name))
+        temp_response.operator_sign = ScanDetails_obj.operator_sign
         return temp_response
 
     # def fetch_scandetails(self, vys_page, shift_details):
