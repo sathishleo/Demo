@@ -52,8 +52,6 @@ class Controll_service:
                 condition &= Q(operator__company=company)
             if device_id is not None and device_id != "":
                 condition &= Q(device_id=int(device_id))
-            if operator_id is not None and operator_id != "":
-                condition &= Q(operator_id=int(operator_id))
             if start_date is not None and start_date != "" and end_date is not None and end_date != "":
                 condition &= Q(check_date__range=[start_date, end_date])
             elif start_date is not None and start_date != "":

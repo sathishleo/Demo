@@ -47,7 +47,6 @@ def checksheet_create(request):
         location = request.GET.get('location')
         company = request.GET.get('company')
         device_id = request.GET.get('device_id')
-        operator_id = request.GET.get('operator_id')
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')
         start_time = request.GET.get('start_time')
@@ -69,7 +68,7 @@ def checksheet_create(request):
             # Ensure the date string includes default time if missing
             if len(end_time_str) == 10:  # Format: YYYY-MM-DD
                 end_time_str += " 00:00:00"
-        resp_obj = service.fetch_Controll(page_number,per_page, control_operator_id,search,location,company,device_id,operator_id,start_date_str,end_time_str,start_time,end_time)
+        resp_obj = service.fetch_Controll(page_number,per_page, control_operator_id,search,location,company,device_id,start_date_str,end_time_str,start_time,end_time)
         # response = HttpResponse(resp_obj.get(), content_type="application/json")
         return resp_obj
 
