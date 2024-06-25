@@ -1,3 +1,5 @@
+import datetime
+
 from django.core.paginator import Paginator
 from django.db.models import Q, F
 from django.http import JsonResponse
@@ -26,6 +28,9 @@ class Controll_service:
         temp_response.set_device_id(Controll_obj.device_id)
         temp_response.set_control_operator_id(Controll_obj.control_operator.operator_id)
         temp_response.set_control_sheet_id(Controll_obj.control_sheet_id)
+        check_date_datetime = datetime.datetime.strptime(Controll_obj.check_date, "%Y-%m-%d %H:%M:%S")
+        time_str = check_date_datetime.strftime("%H:%M:%S")
+        temp_response.check_time=str(time_str)
         temp_response.set_check_date(str(Controll_obj.check_date))
         return temp_response
 
@@ -48,9 +53,9 @@ class Controll_service:
             if operator_id != None and operator_id != "":
                 condition &= Q(operator_id=int(operator_id))
             if start_date != None and start_date != "" and end_date != None and end_date != "" :
-                condition &= Q(created_date__range=[start_date,end_date])
+                condition &= Q(check_date__range=[start_date,end_date])
             if start_date != None and start_date != "":
-                condition &= Q(created_date=start_date)
+                condition &= Q(check_date=start_date)
             if control_operator_id != None and control_operator_id != "":
                 condition &= Q(control_operator_id=int(control_operator_id))
             keywords = ControlSheet.objects.filter(condition).values('device_id', 'control_sheet_id', 'control_operator_id', 'check_date','status')
@@ -59,8 +64,11 @@ class Controll_service:
         data = []
         page_obj = paginator.get_page(page_number)
         for kw in page_obj.object_list:
+            check_date_datetime = datetime.datetime.strptime(str(kw["check_date"]),  "%Y-%m-%d %H:%M:%S%z")
+            time_str = check_date_datetime.strftime("%H:%M:%S")
+
             data.append({"device_id": kw["device_id"], "control_sheet_id": kw["control_sheet_id"], "control_operator_id": kw["control_operator_id"],
-                         "check_date": str(kw["check_date"]),
+                         "check_date": str(kw["check_date"]),"check_time":time_str,
                          "status": kw["status"]})
         payload = {
             "page": {
@@ -107,7 +115,10 @@ class Controll_service:
     def Controll_get(self, control_sheet_id):
         id_obj = ControlSheet.objects.get(control_sheet_id=control_sheet_id)
         temp_response = ControlSheet_response()
+        check_date_datetime = datetime.datetime.strptime(str(id_obj.check_date), "%Y-%m-%d %H:%M:%S%z")
+        time_str = check_date_datetime.strftime("%H:%M:%S")
         temp_response.set_device_id(id_obj.device_id)
+        temp_response.check_time = str(time_str)
         temp_response.set_control_operator_id(id_obj.control_operator.operator_id)
         temp_response.set_control_sheet_id(id_obj.control_sheet_id)
         temp_response.set_check_date(str(id_obj.check_date))
@@ -194,7 +205,7 @@ class checkrule_service:
             temp_response.set_remark(id_obj.remark)
             list_obj.append(temp_response)
 
-        return temp_response
+        return list_obj
 
     def modification_checkrule(self, checkrule_id, status):
         modification_obj = CheckRule.objects.filter(checkrule_id=checkrule_id).update(status=status)

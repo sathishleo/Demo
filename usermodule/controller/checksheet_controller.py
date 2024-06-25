@@ -51,7 +51,23 @@ def checksheet_create(request):
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')
         service = Controll_service()
-        resp_obj = service.fetch_Controll(page_number,per_page, control_operator_id,search,location,company,device_id,operator_id,start_date,end_date)
+        start_date_str=None
+        if start_date:
+            # Clean the date string from quotes if necessary
+            start_date_str = start_date.strip('\'"')
+
+            # Ensure the date string includes default time if missing
+            if len(start_date_str) == 10:  # Format: YYYY-MM-DD
+                start_date_str += " 00:00:00"
+        end_time_str=None
+        if end_date:
+            # Clean the date string from quotes if necessary
+            end_time_str = end_date.strip('\'"')
+
+            # Ensure the date string includes default time if missing
+            if len(end_time_str) == 10:  # Format: YYYY-MM-DD
+                end_time_str += " 00:00:00"
+        resp_obj = service.fetch_Controll(page_number,per_page, control_operator_id,search,location,company,device_id,operator_id,start_date_str,end_time_str)
         # response = HttpResponse(resp_obj.get(), content_type="application/json")
         return resp_obj
 
