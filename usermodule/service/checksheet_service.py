@@ -247,6 +247,8 @@ class scandetails_service:
                 temp_response.set_scan_date(str(ScanDetails_obj.scan_date))
                 temp_response.set_start_time(ScanDetails_obj.start_time)
                 temp_response.set_end_time(ScanDetails_obj.end_time)
+                temp_response.operator_name = str(ScanDetails_obj.operator.first_name) + " " + str(
+                    (ScanDetails_obj.operator.last_name))
                 temp_response.operator_sign=ScanDetails_obj.operator_sign
                 temp_response.created_date = str(ScanDetails_obj.created_date)
                 return temp_response
@@ -309,7 +311,7 @@ class scandetails_service:
             keywords = ScanDetails.objects.filter(
                 Q(device_id=query_text)|
                 Q(operator_id=query_text)
-            ).values('scan_details_id', 'device_id', 'operator_id', 'scan_date', 'start_time', 'end_time','shift_details','status','operator__first_name','operator__last_name','shift_details__supervisor','created_date')
+            ).values('scan_details_id', 'device_id', 'operator_id', 'scan_date', 'start_time', 'end_time','shift_details','status','operator__first_name','operator__last_name','shift_details__supervisor','created_date','operator_sign')
         else:
             condition = Q()
             if company != None and company != "":
@@ -332,7 +334,7 @@ class scandetails_service:
 
             if shift_details != None and shift_details != "":
                 condition &= Q(shift_details_id=int(shift_details))
-            keywords = ScanDetails.objects.filter(condition).values('scan_details_id', 'device_id', 'operator_id', 'scan_date', 'start_time', 'end_time','shift_details','status','operator__first_name','operator__last_name','shift_details__supervisor','created_date').order_by("-created_date")
+            keywords = ScanDetails.objects.filter(condition).values('scan_details_id', 'device_id', 'operator_id', 'scan_date', 'start_time', 'end_time','shift_details','status','operator__first_name','operator__last_name','shift_details__supervisor','created_date','operator_sign').order_by("-created_date")
         count = ScanDetails.objects.count()
         paginator = Paginator(keywords, per_page)
         data = []
@@ -343,8 +345,8 @@ class scandetails_service:
                          "start_time": str(kw["start_time"]),
                          "shift_details": kw["shift_details"],
                          "end_time": str(kw["end_time"]),
-                         "operator_name": str(kw["operator__first_name"])+""+str(kw["operator__last_name"]),
-                         "status": kw["status"],"supervisor":kw["shift_details__supervisor"]})
+                         "operator_name": str(kw["operator__first_name"])+" "+str(kw["operator__last_name"]),
+                         "status": kw["status"],"supervisor":kw["shift_details__supervisor"],"operator_sign":kw["operator_sign"]})
         payload = {
             "page": {
                 "current": page_obj.number,
