@@ -305,11 +305,9 @@ class scandetails_service:
             keywords = ScanDetails.objects.filter(
                 Q(device_id=query_text)|
                 Q(operator_id=query_text)
-            ).values('scan_details_id', 'device_id', 'operator_id', 'scan_date', 'start_time', 'end_time','shift_details','status','operator__first_name')
+            ).values('scan_details_id', 'device_id', 'operator_id', 'scan_date', 'start_time', 'end_time','shift_details','status','operator__first_name','operator__last_name','shift_details__supervisor')
         else:
             condition = Q()
-            if shift_details != None and shift_details != "":
-                condition &= Q(shift_details_id=int(shift_details))
             if company != None and company != "":
                 condition &= Q(operator__company=company)
             if device_id != None and device_id != "":
@@ -324,11 +322,13 @@ class scandetails_service:
                 condition &= Q(start_time=start_time)
             if end_time != None and end_time != "":
                 condition &= Q(end_time=end_time)
+            if supervisor_name != None and supervisor_name != "":
+                condition &= Q(shift_details__supervisor__icontains=supervisor_name)
 
 
             if shift_details != None and shift_details != "":
                 condition &= Q(shift_details_id=int(shift_details))
-            keywords = ScanDetails.objects.filter(condition).values('scan_details_id', 'device_id', 'operator_id', 'scan_date', 'start_time', 'end_time','shift_details','status','operator__first_name')
+            keywords = ScanDetails.objects.filter(condition).values('scan_details_id', 'device_id', 'operator_id', 'scan_date', 'start_time', 'end_time','shift_details','status','operator__first_name','operator__last_name','shift_details__supervisor')
         count = ScanDetails.objects.count()
         paginator = Paginator(keywords, per_page)
         data = []
@@ -339,8 +339,8 @@ class scandetails_service:
                          "start_time": str(kw["start_time"]),
                          "shift_details": kw["shift_details"],
                          "end_time": str(kw["end_time"]),
-                         "operator_name": kw["operator__first_name"],
-                         "status": kw["status"]})
+                         "operator_name": str(kw["operator__first_name"])+""+str(kw["operator__last_name"]),
+                         "status": kw["status"],"supervisor":kw["shift_details__supervisor"]})
         payload = {
             "page": {
                 "current": page_obj.number,
