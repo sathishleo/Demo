@@ -52,6 +52,10 @@ class deviceservice:
             keywords = Device.objects.filter(
                 Q(device_model__icontains=query_text) |
                 Q(device_number__icontains=query_text) |
+                Q(tunnel_size__icontains=query_text) |
+                Q(monitor_brand__icontains=query_text) |
+                Q(location__icontains=query_text) |
+                Q(software_version__icontains=query_text) |
                 Q(monitor_brand__icontains=query_text)).values('device_id', 'device_model', 'device_number', 'tunnel_size', 'status',
                      'monitor_brand', 'location', 'software_version', 'keyboard_brand')
         else:
@@ -135,13 +139,16 @@ class Operator_service:
         temp_response.set_phone(operator_obj.phone)
         return temp_response
 
-    def fetch_operator(self, page_number, per_page, first_name,query_text):
+    def fetch_operator(self, page_number, per_page, first_name,query_text,operator_id,last_name,company,employee_id,email_address,phone):
 
         if query_text==None and query_text=="" :
             keywords = Operator.objects.filter(
                 Q(first_name__icontains=query_text) |
                 Q(last_name__icontains=query_text) |
-                Q(company__icontains=query_text)
+                Q(company__icontains=query_text) |
+                Q(employee_id__icontains=query_text) |
+                Q(email_address__icontains=query_text) |
+                Q(phone__icontains=query_text)
             ).values('operator_id', 'first_name', 'last_name', 'company', 'employee_id', 'email_address', 'phone',
                      'status')
         else:
@@ -149,6 +156,18 @@ class Operator_service:
             condition = Q()
             if first_name != None and first_name != "":
                 condition &= Q(first_name__icontains=first_name)
+            if last_name != None and last_name != "":
+                condition &= Q(last_name__icontains=last_name)
+            if company != None and company != "":
+                condition &= Q(company__icontains=company)
+            if employee_id != None and employee_id != "":
+                condition &= Q(employee_id__icontains=employee_id)
+            if email_address != None and email_address != "":
+                condition &= Q(email_address__icontains=email_address)
+            if phone != None and phone != "":
+                condition &= Q(phone__icontains=phone)
+            if operator_id != None and operator_id != "":
+                condition &= Q(operator_id__icontains=operator_id)
             keywords = Operator.objects.filter(condition).values('operator_id', 'first_name', 'last_name', 'company',
                                                                  'employee_id', 'email_address', 'phone', 'status')
         count = Operator.objects.count()
