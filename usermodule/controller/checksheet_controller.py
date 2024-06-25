@@ -50,6 +50,8 @@ def checksheet_create(request):
         operator_id = request.GET.get('operator_id')
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')
+        start_time = request.GET.get('end_date')
+        end_time = request.GET.get('end_date')
         service = Controll_service()
         start_date_str=None
         if start_date:
