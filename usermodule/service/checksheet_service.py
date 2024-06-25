@@ -35,30 +35,33 @@ class Controll_service:
         return temp_response
 
     def fetch_Controll(self, page_number,per_page, control_operator_id,search,location,company,device_id,operator_id,start_date,end_date):
-        if search != None and search != "":
-            keywords = ControlSheet.objects.filter(
-                Q(device_id=search)|
-                Q(operator_id=search)
-            ).values('device_id', 'control_sheet_id', 'control_operator_id', 'check_date','status')
+        from django.db.models import Q
+
+        condition = Q()
+
+        if search is not None and search != "":
+            # If search is provided, filter based on search across device_id or operator_id
+            condition |= Q(device_id=search) | Q(operator_id=search)
         else:
-            condition = Q()
-            if control_operator_id != None and control_operator_id != "":
+            # Apply individual filters if provided
+            if control_operator_id is not None and control_operator_id != "":
                 condition &= Q(control_operator_id=int(control_operator_id))
-            if location != None and location != "":
+            if location is not None and location != "":
                 condition &= Q(device__location=location)
-            if company != None and company != "":
+            if company is not None and company != "":
                 condition &= Q(operator__company=company)
-            if device_id != None and device_id != "":
+            if device_id is not None and device_id != "":
                 condition &= Q(device_id=int(device_id))
-            if operator_id != None and operator_id != "":
+            if operator_id is not None and operator_id != "":
                 condition &= Q(operator_id=int(operator_id))
-            if start_date != None and start_date != "" and end_date != None and end_date != "" :
-                condition &= Q(check_date__range=[start_date,end_date])
-            if start_date != None and start_date != "":
+            if start_date is not None and start_date != "" and end_date is not None and end_date != "":
+                condition &= Q(check_date__range=[start_date, end_date])
+            elif start_date is not None and start_date != "":
                 condition &= Q(check_date=start_date)
-            if control_operator_id != None and control_operator_id != "":
-                condition &= Q(control_operator_id=int(control_operator_id))
-            keywords = ControlSheet.objects.filter(condition).values('device_id', 'control_sheet_id', 'control_operator_id', 'check_date','status')
+
+        keywords = ControlSheet.objects.filter(condition).values('device_id', 'control_sheet_id', 'control_operator_id',
+                                                                 'check_date', 'status')
+
         count = ControlSheet.objects.count()
         paginator = Paginator(keywords, per_page)
         data = []
@@ -307,34 +310,40 @@ class scandetails_service:
     #         return error_obj
 
     def fetch_ScanDetails(self, page_number, per_page, shift_details, query_text,company,device_id,operator_id,start_date,end_date,start_time,end_time,supervisor_name):
-        if query_text != None and query_text != "":
-            keywords = ScanDetails.objects.filter(
-                Q(device_id=query_text)|
-                Q(operator_id=query_text)
-            ).values('scan_details_id', 'device_id', 'operator_id', 'scan_date', 'start_time', 'end_time','shift_details','status','operator__first_name','operator__last_name','shift_details__supervisor','created_date','operator_sign')
+        from django.db.models import Q
+
+        condition = Q()
+
+        if query_text is not None and query_text != "":
+            # If query_text is provided, filter based on query_text across device_id or operator_id
+            condition |= Q(device_id=query_text) | Q(operator_id=query_text)
         else:
-            condition = Q()
-            if company != None and company != "":
+            # Apply individual filters if provided
+            if company is not None and company != "":
                 condition &= Q(operator__company=company)
-            if device_id != None and device_id != "":
+            if device_id is not None and device_id != "":
                 condition &= Q(device_id=int(device_id))
-            if operator_id != None and operator_id != "":
+            if operator_id is not None and operator_id != "":
                 condition &= Q(operator_id=int(operator_id))
-            if start_date != None and start_date != "":
+            if start_date is not None and start_date != "" and end_date is not None and end_date != "":
+                condition &= Q(scan_date__range=[start_date, end_date])
+            elif start_date is not None and start_date != "":
                 condition &= Q(scan_date=start_date)
-            if end_date != None and end_date != "":
+            elif end_date is not None and end_date != "":
                 condition &= Q(scan_date=end_date)
-            if start_time != None and start_time != "":
+            if start_time is not None and start_time != "":
                 condition &= Q(start_time=start_time)
-            if end_time != None and end_time != "":
+            if end_time is not None and end_time != "":
                 condition &= Q(end_time=end_time)
-            if supervisor_name != None and supervisor_name != "":
+            if supervisor_name is not None and supervisor_name != "":
                 condition &= Q(shift_details__supervisor__icontains=supervisor_name)
 
-
-            if shift_details != None and shift_details != "":
-                condition &= Q(shift_details_id=int(shift_details))
-            keywords = ScanDetails.objects.filter(condition).values('scan_details_id', 'device_id', 'operator_id', 'scan_date', 'start_time', 'end_time','shift_details','status','operator__first_name','operator__last_name','shift_details__supervisor','created_date','operator_sign').order_by("-created_date")
+        # Fetch the filtered results
+        keywords = ScanDetails.objects.filter(condition).values(
+            'scan_details_id', 'device_id', 'operator_id', 'scan_date', 'start_time', 'end_time',
+            'shift_details', 'status', 'operator__first_name', 'operator__last_name', 'shift_details__supervisor',
+            'created_date', 'operator_sign'
+        ).order_by("-created_date")
         count = ScanDetails.objects.count()
         paginator = Paginator(keywords, per_page)
         data = []
@@ -608,32 +617,36 @@ class dropdown_service:
                 return success_obj
 
     def fetch_dropdown(self, page_number, per_page, list_type,search):
-        if search!=None and search!="":
-            keywords = DropDown.objects.filter(
-                Q(list_item__icontains=search) |
-                Q(list_type__icontains=search)
+        from django.db.models import Q
 
-            ).values('drop_down_id','list_item' ,'list_type','status')
+        condition = Q()
+
+        if search is not None and search != "":
+            # If search is provided, filter based on search across multiple fields
+            condition |= Q(list_item__icontains=search) | Q(list_type__icontains=search)
         else:
-            condition=Q()
-            if list_type!=None and list_type!="":
-                condition&=Q(list_type=list_type)
-            keywords = DropDown.objects.filter(condition).values('drop_down_id','list_item' ,'list_type','status')
-            count=DropDown.objects.count()
-            paginator = Paginator(keywords, per_page)
-            data=[]
-            page_obj = paginator.get_page(page_number)
-            for kw in page_obj.object_list:
-                data.append({"drop_down_id": kw["drop_down_id"],"list_item":kw["list_item"],"list_type":kw["list_type"],"status":kw["status"]})
+            # Apply individual filters if provided
+            if list_type is not None and list_type != "":
+                condition &= Q(list_type=list_type)
 
-            payload = {
-                "page": {
-                    "current": page_obj.number,
-                    "has_next": page_obj.has_next(),
-                    "has_previous": page_obj.has_previous(),
-                    "count":count
-                },
-                "data": data
-            }
-            return JsonResponse(payload)
+        # Fetch the filtered results
+        keywords = DropDown.objects.filter(condition).values('drop_down_id', 'list_item', 'list_type', 'status')
+
+        count=DropDown.objects.count()
+        paginator = Paginator(keywords, per_page)
+        data=[]
+        page_obj = paginator.get_page(page_number)
+        for kw in page_obj.object_list:
+            data.append({"drop_down_id": kw["drop_down_id"],"list_item":kw["list_item"],"list_type":kw["list_type"],"status":kw["status"]})
+
+        payload = {
+            "page": {
+                "current": page_obj.number,
+                "has_next": page_obj.has_next(),
+                "has_previous": page_obj.has_previous(),
+                "count":count
+            },
+            "data": data
+        }
+        return JsonResponse(payload)
 
