@@ -358,6 +358,7 @@ class scandetails_service:
         temp_response = ScanDetails_response()
         temp_response.set_scan_details_id(id_obj.scan_details_id)
         temp_response.set_device_id(id_obj.device_id)
+        temp_response.set_shift_details_id(id_obj.shift_details_id)
         temp_response.set_operator_id(id_obj.operator.operator_id)
         temp_response.operator_name = str(id_obj.operator.first_name)+" "+str(id_obj.operator.last_name)
         temp_response.set_scan_date(str(id_obj.scan_date))
