@@ -48,37 +48,39 @@ class deviceservice:
         return temp_response
 
     def fetch_device(self,  page_number, per_page, device_model,query_text,device_number,tunnel_size,monitor_brand,location,software_version,keyboard_brand):
-        if query_text == None and query_text == "":
-            keywords = Device.objects.filter(
-                Q(device_model__icontains=query_text) |
-                Q(device_number__icontains=query_text) |
-                Q(tunnel_size__icontains=query_text) |
-                Q(monitor_brand__icontains=query_text) |
-                Q(location__icontains=query_text) |
-                Q(software_version__icontains=query_text) |
-                Q(monitor_brand__icontains=query_text)).values('device_id', 'device_model', 'device_number', 'tunnel_size', 'status',
-                     'monitor_brand', 'location', 'software_version', 'keyboard_brand')
-        else:
-            condition = Q()
-            if device_model != None and device_model != "":
-                condition &= Q(device_model__icontains=device_model)
-            if device_number != None and device_number != "":
-                condition &= Q(device_number__icontains=device_number)
-            if tunnel_size != None and tunnel_size != "":
-                condition &= Q(tunnel_size__icontains=tunnel_size)
-            if monitor_brand != None and monitor_brand != "":
-                condition &= Q(monitor_brand__icontains=monitor_brand)
-            if location != None and location != "":
-                condition &= Q(location__icontains=location)
-            if software_version != None and software_version != "":
-                condition &= Q(software_version__icontains=software_version)
-            if keyboard_brand != None and keyboard_brand != "":
-                condition &= Q(keyboard_brand__icontains=keyboard_brand)
-            keywords = Device.objects.filter(condition).values('device_id', 'device_model', 'device_number',
-                                                               'tunnel_size', 'status',
-                                                                              'monitor_brand', 'location',
-                                                               'software_version', 'keyboard_brand')
+        condition = Q()
 
+        if query_text is not None and query_text != "":
+            # If query_text is provided, filter based on query_text across multiple fields
+            condition |= Q(device_model__icontains=query_text) | \
+                         Q(device_number__icontains=query_text) | \
+                         Q(tunnel_size__icontains=query_text) | \
+                         Q(monitor_brand__icontains=query_text) | \
+                         Q(location__icontains=query_text) | \
+                         Q(software_version__icontains=query_text) | \
+                         Q(keyboard_brand__icontains=query_text)
+        else:
+            # Apply individual filters if provided
+            if device_model is not None and device_model != "":
+                condition &= Q(device_model__icontains=device_model)
+            if device_number is not None and device_number != "":
+                condition &= Q(device_number__icontains=device_number)
+            if tunnel_size is not None and tunnel_size != "":
+                condition &= Q(tunnel_size__icontains=tunnel_size)
+            if monitor_brand is not None and monitor_brand != "":
+                condition &= Q(monitor_brand__icontains=monitor_brand)
+            if location is not None and location != "":
+                condition &= Q(location__icontains=location)
+            if software_version is not None and software_version != "":
+                condition &= Q(software_version__icontains=software_version)
+            if keyboard_brand is not None and keyboard_brand != "":
+                condition &= Q(keyboard_brand__icontains=keyboard_brand)
+
+        # Fetch the filtered results
+        keywords = Device.objects.filter(condition).values(
+            'device_id', 'device_model', 'device_number', 'tunnel_size', 'status',
+            'monitor_brand', 'location', 'software_version', 'keyboard_brand'
+        )
         count = Device.objects.count()
         paginator = Paginator(keywords, per_page)
         data = []
@@ -141,35 +143,40 @@ class Operator_service:
 
     def fetch_operator(self, page_number, per_page, first_name,query_text,operator_id,last_name,company,employee_id,email_address,phone):
 
-        if query_text==None and query_text=="" :
-            keywords = Operator.objects.filter(
-                Q(first_name__icontains=query_text) |
-                Q(last_name__icontains=query_text) |
-                Q(company__icontains=query_text) |
-                Q(employee_id__icontains=query_text) |
-                Q(email_address__icontains=query_text) |
-                Q(phone__icontains=query_text)
-            ).values('operator_id', 'first_name', 'last_name', 'company', 'employee_id', 'email_address', 'phone',
-                     'status')
-        else:
+        from django.db.models import Q
 
-            condition = Q()
-            if first_name != None and first_name != "":
+        condition = Q()
+
+        if query_text is not None and query_text != "":
+            # If query_text is provided, filter based on query_text across multiple fields
+            condition |= Q(first_name__icontains=query_text) | \
+                         Q(last_name__icontains=query_text) | \
+                         Q(company__icontains=query_text) | \
+                         Q(employee_id__icontains=query_text) | \
+                         Q(email_address__icontains=query_text) | \
+                         Q(phone__icontains=query_text)
+        else:
+            # Apply individual filters if provided
+            if first_name is not None and first_name != "":
                 condition &= Q(first_name__icontains=first_name)
-            if last_name != None and last_name != "":
+            if last_name is not None and last_name != "":
                 condition &= Q(last_name__icontains=last_name)
-            if company != None and company != "":
+            if company is not None and company != "":
                 condition &= Q(company__icontains=company)
-            if employee_id != None and employee_id != "":
+            if employee_id is not None and employee_id != "":
                 condition &= Q(employee_id__icontains=employee_id)
-            if email_address != None and email_address != "":
+            if email_address is not None and email_address != "":
                 condition &= Q(email_address__icontains=email_address)
-            if phone != None and phone != "":
+            if phone is not None and phone != "":
                 condition &= Q(phone__icontains=phone)
-            if operator_id != None and operator_id != "":
+            if operator_id is not None and operator_id != "":
                 condition &= Q(operator_id__icontains=operator_id)
-            keywords = Operator.objects.filter(condition).values('operator_id', 'first_name', 'last_name', 'company',
-                                                                 'employee_id', 'email_address', 'phone', 'status')
+
+        # Fetch the filtered results
+        keywords = Operator.objects.filter(condition).values(
+            'operator_id', 'first_name', 'last_name', 'company', 'employee_id', 'email_address', 'phone', 'status'
+        )
+
         count = Operator.objects.count()
         paginator = Paginator(keywords, per_page)
         data = []
