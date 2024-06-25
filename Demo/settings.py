@@ -41,8 +41,7 @@ INSTALLED_APPS = [
     'usermodule',
     'userservice',
     'knox',
-    'drf_yasg'
-
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -53,6 +52,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'Demo.urls'
@@ -82,9 +83,9 @@ WSGI_APPLICATION = 'Demo.wsgi.application'
 DATABASES = {
     'default': {
                 'ENGINE': 'django.db.backends.mysql',
-                'NAME': 'new_schema07',
+                'NAME': 'xray-app',
                 'USER': 'root',
-                'PASSWORD':'1234',
+                'PASSWORD':'toor',
                 'PORT': '3306',
                 'HOST': '127.0.0.1'
     }
@@ -109,6 +110,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # React app URL
+    "http://localhost:5173",  # React app URL
+    "http://localhost:5174",  # React app URL
+]
+
+# Or use this to allow all origins (development only)
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/

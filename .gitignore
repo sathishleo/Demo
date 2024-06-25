@@ -1,0 +1,81 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django specific
+*.log
+*.pot
+*.pyc
+*.mo
+*.pyo
+*.compiled
+__pycache__/
+migrations
+local_settings.py
+
+# Virtual environment
+*.venv
+
+# SQL
+*.sqlite3
+
+# Media
+media
+
+# Static files
+/staticfiles
+
+# Node modules
+node_modules/
+
+# Environments
+.env
+*.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Coverage reports
+htmlcov/
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# Sphinx documentation
+docs/_build/
+
+# Testing
+.pytest_cache/
+test*.log
+junit*.xml
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pylint
+pylintreport.txt
+
+# Flask specific (if using both)
+instance/
+.webassets-cache
+
+# IDEs
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Yarn
+.yarn/
+.pnp.*

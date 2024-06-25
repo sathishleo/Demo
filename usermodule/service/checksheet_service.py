@@ -189,14 +189,14 @@ class checkrule_service:
         temp_response.set_rule_id(id_obj.rule_id)
         temp_response.set_control_sheet_id(id_obj.control_sheet_id)
         temp_response.set_remark(id_obj.remark)
-
         return temp_response
+
 
     def controllsheet_get(self, control_sheet_id):
         filter_obj = CheckRule.objects.filter(control_sheet_id=control_sheet_id)
-        temp_response = CheckRule_response()
         list_obj=Demo_List()
         for id_obj in filter_obj:
+            temp_response = CheckRule_response()
 
             temp_response.set_rule_choice(id_obj.rule_choice)
             temp_response.set_checkrule_id(id_obj.checkrule_id)
@@ -396,7 +396,7 @@ class scandetails_service:
             check = True
         else:
             # Get the desired time duration from TimeMaintenance
-            Time_obj = TimeMaintenance.objects.get(time_type=2)
+            Time_obj = TimeMaintenance.objects.get(time_type="interval")
             # Assuming Time_obj has an attribute `desired_minutes` which specifies the allowed time frame in minutes
             allowed_minutes = Time_obj.decided_minutes
 
