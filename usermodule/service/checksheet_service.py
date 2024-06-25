@@ -58,6 +58,11 @@ class Controll_service:
                 condition &= Q(check_date__range=[start_date, end_date])
             elif start_date is not None and start_date != "":
                 condition &= Q(check_date=start_date)
+            elif start_time != None and start_time != "":
+                condition &= Q(start_time=start_time)
+            elif end_time != None and end_time != "":
+                condition &= Q(end_time=end_time)
+
 
         keywords = ControlSheet.objects.filter(condition).values('device_id', 'control_sheet_id', 'control_operator_id',
                                                                  'check_date', 'status')
