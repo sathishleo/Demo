@@ -49,7 +49,7 @@ class Controll_service:
             if location is not None and location != "":
                 condition &= Q(device__location=location)
             if company is not None and company != "":
-                condition &= Q(operator__company=company)
+                condition &= Q(control_operator__company=company)
             if device_id is not None and device_id != "":
                 condition &= Q(device_id=int(device_id))
             if start_date is not None and start_date != "" and end_date is not None and end_date != "":
