@@ -34,14 +34,14 @@ class Controll_service:
         temp_response.set_check_date(str(Controll_obj.check_date))
         return temp_response
 
-    def fetch_Controll(self, page_number,per_page, control_operator_id,search,location,company,device_id,operator_id,start_date,end_date,start_time,end_time):
+    def fetch_Controll(self, page_number,per_page, control_operator_id,search,location,company,device_id,start_date,end_date,start_time,end_time):
         from django.db.models import Q
 
         condition = Q()
 
         if search is not None and search != "":
             # If search is provided, filter based on search across device_id or operator_id
-            condition |= Q(device_id=search) | Q(operator_id=search)
+            condition |= Q(device_id=search) | Q(control_operator_id=search)
         else:
             # Apply individual filters if provided
             if control_operator_id is not None and control_operator_id != "":
