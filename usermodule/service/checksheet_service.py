@@ -323,7 +323,7 @@ class scandetails_service:
         else:
             # Apply individual filters if provided
             if company is not None and company != "":
-                condition &= Q(operator__company=company)
+                condition &= Q(operator__company__icontains=company)
             if device_id is not None and device_id != "":
                 condition &= Q(device_id=int(device_id))
             if operator_id is not None and operator_id != "":
@@ -333,13 +333,13 @@ class scandetails_service:
             if start_date is not None and start_date != "" and end_date is not None and end_date != "":
                 condition &= Q(scan_date__range=[start_date, end_date])
             elif start_date is not None and start_date != "":
-                condition &= Q(scan_date=start_date)
+                condition &= Q(scan_date__gte=start_date)
             elif end_date is not None and end_date != "":
-                condition &= Q(scan_date=end_date)
+                condition &= Q(scan_date__lte=end_date)
             if start_time is not None and start_time != "":
-                condition &= Q(start_time=start_time)
+                condition &= Q(start_time__gte=start_time)
             if end_time is not None and end_time != "":
-                condition &= Q(end_time=end_time)
+                condition &= Q(end_time__lte=end_time)
             if supervisor_name is not None and supervisor_name != "":
                 condition &= Q(shift_details__supervisor__icontains=supervisor_name)
 
