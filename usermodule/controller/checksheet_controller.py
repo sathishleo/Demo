@@ -160,8 +160,11 @@ def scandetails_create(request):
         scandetails_obj = ScanDetails_request(scandetails_data)
         Scandetails_service = scandetails_service()
         resp_obj = Scandetails_service.create_scandetails(scandetails_obj)
-        response = HttpResponse(resp_obj.get(), content_type="application/json")
-        return response
+        if resp_obj.status_code==400:
+            return resp_obj
+        else:
+            response = HttpResponse(resp_obj.get(), content_type="application/json")
+            return response
 
     if request.method == 'GET':
         page_number = request.GET.get('page', 1)

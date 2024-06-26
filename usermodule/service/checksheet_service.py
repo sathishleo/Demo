@@ -260,8 +260,9 @@ class scandetails_service:
                 return temp_response
             else:
                 error=Error()
+                error.set_status(400)
                 error.set_description("vaild break time")
-                return error
+                return error.to_response()
         else:
             ScanDetails_obj = ScanDetails.objects.filter(scan_details_id=request_obj.get_scan_details_id()).update(device_id=request_obj.get_device_id(),operator_id=request_obj.get_operator_id(),scan_date=request_obj.get_scan_date(),start_time=request_obj.get_start_time(),end_time=request_obj.get_end_time(),shift_details_id=request_obj.get_shift_details_id(),updated_date=now(),operator_sign=request_obj.get_operator_sign())
             ScanDetails_obj = ScanDetails.objects.get(scan_details_id=request_obj.get_scan_details_id())
@@ -434,9 +435,9 @@ class scandetails_service:
             check = True
         else:
             # Get the desired time duration from TimeMaintenance
-            Time_obj = TimeMaintenance.objects.get(time_type="interval")
+            Time_obj = TimeMaintenance.objects.filter(time_type="interval",current_status=True)
             # Assuming Time_obj has an attribute `desired_minutes` which specifies the allowed time frame in minutes
-            allowed_minutes = Time_obj.decided_minutes
+            allowed_minutes = Time_obj[0].decided_minutes
 
             # Get the latest maintenance record's created_date
             latest_maintenance_date = maintenance[0].created_date
