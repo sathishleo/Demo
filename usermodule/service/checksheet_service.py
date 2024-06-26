@@ -328,6 +328,8 @@ class scandetails_service:
                 condition &= Q(device_id=int(device_id))
             if operator_id is not None and operator_id != "":
                 condition &= Q(operator_id=int(operator_id))
+            if shift_details is not None and shift_details != "":
+                condition &= Q(shift_details_id=int(shift_details))
             if start_date is not None and start_date != "" and end_date is not None and end_date != "":
                 condition &= Q(scan_date__range=[start_date, end_date])
             elif start_date is not None and start_date != "":
