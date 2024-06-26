@@ -314,6 +314,9 @@ class scandetails_service:
 
     def fetch_ScanDetails(self, page_number, per_page, shift_details, query_text,company,device_id,operator_id,start_date,end_date,start_time,end_time,supervisor_name):
         from django.db.models import Q
+        from django.core.paginator import Paginator
+        from django.http import JsonResponse
+
 
         condition = Q()
 
@@ -349,18 +352,28 @@ class scandetails_service:
             'shift_details', 'status', 'operator__first_name', 'operator__last_name', 'shift_details__supervisor',
             'created_date', 'operator_sign'
         ).order_by("-created_date")
-        count = ScanDetails.objects.count()
+
+        count = ScanDetails.objects.filter(condition).count()
         paginator = Paginator(keywords, per_page)
         data = []
         page_obj = paginator.get_page(page_number)
+
         for kw in page_obj.object_list:
-            data.append({"scan_details_id": kw["scan_details_id"], "device_id": kw["device_id"], "operator_id": kw["operator_id"],
-                         "scan_date": str(kw["scan_date"]),"created_date":str(kw["created_date"]),
-                         "start_time": str(kw["start_time"]),
-                         "shift_details": kw["shift_details"],
-                         "end_time": str(kw["end_time"]),
-                         "operator_name": str(kw["operator__first_name"])+" "+str(kw["operator__last_name"]),
-                         "status": kw["status"],"supervisor":kw["shift_details__supervisor"],"operator_sign":kw["operator_sign"]})
+            data.append({
+                "scan_details_id": kw["scan_details_id"],
+                "device_id": kw["device_id"],
+                "operator_id": kw["operator_id"],
+                "scan_date": str(kw["scan_date"]),
+                "created_date": str(kw["created_date"]),
+                "start_time": str(kw["start_time"]),
+                "shift_details": kw["shift_details"],
+                "end_time": str(kw["end_time"]),
+                "operator_name": str(kw["operator__first_name"]) + " " + str(kw["operator__last_name"]),
+                "status": kw["status"],
+                "supervisor": kw["shift_details__supervisor"],
+                "operator_sign": kw["operator_sign"]
+            })
+
         payload = {
             "page": {
                 "current": page_obj.number,
@@ -370,6 +383,7 @@ class scandetails_service:
             },
             "data": data
         }
+
         return JsonResponse(payload)
 
 
