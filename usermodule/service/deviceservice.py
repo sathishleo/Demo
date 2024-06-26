@@ -251,66 +251,74 @@ class ECAC_service:
         return temp_response
 
     def fetch_ecac(self, page_number, per_page, test_view,query_text,start_date,end_date,start_time,end_time,device_id,tunnel_size,device_model,software_version,operator_id,location,company,position):
-        if query_text==None and query_text=="" :
-            keywords = ECAC.objects.filter(
-                Q(test_view__icontains=query_text) |
-                Q(device_id__icontains=query_text) |
-                Q(operator_id__icontains=query_text)
-            ).values('operator_id', 'first_name', 'last_name', 'company', 'employee_id', 'email_address', 'phone',
-                     'status')
+        from django.db.models import Q
+        from django.core.paginator import Paginator
+        from django.http import JsonResponse
+
+        condition = Q()
+
+        if query_text is not None and query_text != "":
+            condition |= Q(test_view__icontains=query_text) | Q(device_id__icontains=query_text) | Q(
+                operator_id__icontains=query_text)
         else:
-            condition = Q()
-            if test_view != None and test_view != "":
+            if test_view is not None and test_view != "":
                 condition &= Q(test_view__icontains=test_view)
-            if start_date != None and start_date != "":
-                condition &= Q(test_date__icontains=start_date)
-            if end_date != None and end_date != "":
-                condition &= Q(test_date__icontains=end_date)
-            if start_time != None and start_time != "":
-                condition &= Q(test_time__icontains=start_time)
-            if end_time != None and end_time != "":
-                condition &= Q(test_view__icontains=end_time)
-            if device_id != None and device_id != "":
+            if start_date is not None and start_date != "" and end_date is not None and end_date != "":
+                condition &= Q(test_date__range=[start_date, end_date])
+            elif start_date is not None and start_date != "":
+                condition &= Q(test_date__gte=start_date)
+            elif end_date is not None and end_date != "":
+                condition &= Q(test_date__lte=end_date)
+            if start_time is not None and start_time != "" and end_time is not None and end_time != "":
+                condition &= Q(test_time__range=[start_time, end_time])
+            elif start_time is not None and start_time != "":
+                condition &= Q(test_time__gte=start_time)
+            elif end_time is not None and end_time != "":
+                condition &= Q(test_time__lte=end_time)
+            if device_id is not None and device_id != "":
                 condition &= Q(device_id=device_id)
-            if tunnel_size != None and tunnel_size != "":
+            if tunnel_size is not None and tunnel_size != "":
                 condition &= Q(device__tunnel_size=tunnel_size)
-            if device_model != None and device_model != "":
+            if device_model is not None and device_model != "":
                 condition &= Q(device__device_model=device_model)
-            if software_version != None and software_version != "":
+            if software_version is not None and software_version != "":
                 condition &= Q(device__software_version=software_version)
-            if operator_id != None and operator_id != "":
+            if operator_id is not None and operator_id != "":
                 condition &= Q(operator_id=operator_id)
-            if location != None and location != "":
+            if location is not None and location != "":
                 condition &= Q(device__location=location)
-            if company != None and company != "":
+            if company is not None and company != "":
                 condition &= Q(operator__company=company)
-            if position != None and position != "":
+            if position is not None and position != "":
                 condition &= Q(position=position)
-            if start_time != None and start_time != "" and end_time != None and end_time != "":
-                condition &= Q(test_time__range=[start_time,end_time])
-            if start_date != None and start_date != "" and end_date != None and end_date != "":
-                condition &= Q(test_date__range=[start_date,end_date])
-            keywords = ECAC.objects.filter(condition).values('operator_id', 'device_id', 'ecac_id', 'position',
-                                                                 'test_date', 'test_time', 'test_view', 'status','test_1test_2','test_3','test_4a','test_4b','test_5')
-            count = ECAC.objects.count()
-            paginator = Paginator(keywords, per_page)
-            data = []
-            page_obj = paginator.get_page(page_number)
-            for kw in page_obj.object_list:
-                data.append({"operator_id": kw["operator_id"], "device_id": kw["device_id"], "ecac_id": kw["ecac_id"],
-                             "position": kw["position"],
-                             "test_date": kw["test_date"], "test_time": kw["test_time"], "test_view": kw["test_view"],
-                             "status": kw["status"],"test_1test_2": kw["test_1test_2"],"test_3": kw["test_3"],"test_4a": kw["test_4a"],"test_4b": kw["test_4b"],"test_5": kw["test_5"]})
-            payload = {
-                "page": {
-                    "current": page_obj.number,
-                    "has_next": page_obj.has_next(),
-                    "has_previous": page_obj.has_previous(),
-                    "count": count
-                },
-                "data": data
-            }
-            return JsonResponse(payload)
+
+        keywords = ECAC.objects.filter(condition).values(
+            'operator_id', 'device_id', 'ecac_id', 'position', 'test_date', 'test_time', 'test_view', 'status',
+            'test_1test_2', 'test_3', 'test_4a', 'test_4b', 'test_5'
+        )
+
+        # Count total items before pagination
+        total_count = keywords.count()
+
+        # Paginate results
+        paginator = Paginator(keywords, per_page)
+        page_obj = paginator.get_page(page_number)
+        data = list(page_obj)
+
+        # Construct payload
+        payload = {
+            "page": {
+                "current": page_obj.number,
+                "has_next": page_obj.has_next(),
+                "has_previous": page_obj.has_previous(),
+                "count": total_count,
+                "total_pages": paginator.num_pages,
+            },
+            "data": data
+        }
+
+        # Return JSON response
+        return JsonResponse(payload)
 
     def ecac_get(self, ecac_id):
         id_obj = ECAC.objects.get(ecac_id=ecac_id)
