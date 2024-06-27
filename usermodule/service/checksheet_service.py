@@ -257,6 +257,7 @@ class scandetails_service:
                     (ScanDetails_obj.operator.last_name))
                 temp_response.operator_sign=ScanDetails_obj.operator_sign
                 temp_response.created_date = str(ScanDetails_obj.created_date)
+                temp_response.status_code = 200
                 return temp_response
             else:
                 error=Error()
@@ -276,6 +277,7 @@ class scandetails_service:
         temp_response.operator_name=str(ScanDetails_obj.operator.first_name)+" "+str((ScanDetails_obj.operator.last_name))
         temp_response.operator_sign = ScanDetails_obj.operator_sign
         temp_response.created_date = str(ScanDetails_obj.created_date)
+        temp_response.status_code = 200
         return temp_response
 
     # def fetch_scandetails(self, vys_page, shift_details):
