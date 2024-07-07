@@ -139,7 +139,7 @@ class Operator_service:
         temp_response.set_employee_id(operator_obj.employee_id)
         temp_response.set_email_address(operator_obj.email_address)
         temp_response.set_phone(operator_obj.phone)
-        temp_response.set_operator_img(operator_obj.operator_img)
+        temp_response.set_operator_img(str(operator_obj.operator_img))
         return temp_response
 
     def fetch_operator(self, page_number, per_page, first_name,query_text,operator_id,last_name,company,employee_id,email_address,phone):
