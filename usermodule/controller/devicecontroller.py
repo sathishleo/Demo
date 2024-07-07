@@ -90,13 +90,14 @@ def view_device(request, device_id):
 # @permission_classes([IsAuthenticated,Permission])
 def operator_create(request):
     if request.method == 'POST':
-        operator_data = json.loads(request.body)
+        operator_data = json.loads(request.data.dict().get('data'))
+        file = request.FILES["file"]
         # user_id = request.user.id
         # emp_service = Emp_service()
         # emp_id = emp_service.get_empid_from_userid(user_id)
         operator_obj = Operator_request(operator_data)
         opera_service = Operator_service()
-        resp_obj = opera_service.create_operator(operator_obj)
+        resp_obj = opera_service.create_operator(operator_obj,file)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
         return response
 
@@ -144,6 +145,17 @@ def operator_search(request):
         resp_obj = service.operator_list(query_text)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
         return response
+
+@csrf_exempt
+@api_view(['GET', 'DELETE'])
+# @authentication_classes([Authentication])
+# @permission_classes([IsAuthenticated,Permission])
+def download_operator(request):
+    if request.method == 'GET':
+        name=request.GET.get("gen_key")
+        service = ECAC_service()
+        resp_obj = service.download_file(name)
+        return resp_obj
 
 @csrf_exempt
 @api_view(['POST', 'GET'])

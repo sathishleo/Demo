@@ -1,6 +1,6 @@
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.utils.timezone import now
 
 from usermodule.data.response.deviceresponse import device_response, Operator_response, ECAC_response
@@ -125,9 +125,9 @@ class deviceservice:
 
 class Operator_service:
 
-    def create_operator(self, request_obj):
+    def create_operator(self, request_obj,file):
         if request_obj.get_operator_id() is  None:
-            operator_obj = Operator.objects.create(first_name=request_obj.get_first_name(),last_name=request_obj.get_last_name(),company=request_obj.get_company(),employee_id=request_obj.get_employee_id(),email_address=request_obj.get_email_address(),phone=request_obj.get_phone())
+            operator_obj = Operator.objects.create(first_name=request_obj.get_first_name(),last_name=request_obj.get_last_name(),company=request_obj.get_company(),employee_id=request_obj.get_employee_id(),email_address=request_obj.get_email_address(),phone=request_obj.get_phone(),operator_img=file)
         else:
             operator_obj = Operator.objects.filter(operator_id=request_obj.get_operator_id()).update(first_name=request_obj.get_first_name(),last_name=request_obj.get_last_name(),company=request_obj.get_company(),employee_id=request_obj.get_employee_id(),email_address=request_obj.get_email_address(),phone=request_obj.get_phone(),updated_date=now())
             operator_obj = Operator.objects.get(operator_id=request_obj.get_operator_id())
@@ -139,6 +139,7 @@ class Operator_service:
         temp_response.set_employee_id(operator_obj.employee_id)
         temp_response.set_email_address(operator_obj.email_address)
         temp_response.set_phone(operator_obj.phone)
+        temp_response.set_operator_img(operator_obj.operator_img)
         return temp_response
 
     def fetch_operator(self, page_number, per_page, first_name,query_text,operator_id,last_name,company,employee_id,email_address,phone):
@@ -174,7 +175,7 @@ class Operator_service:
 
         # Fetch the filtered results
         keywords = Operator.objects.filter(condition).values(
-            'operator_id', 'first_name', 'last_name', 'company', 'employee_id', 'email_address', 'phone', 'status'
+            'operator_id', 'first_name', 'last_name', 'company', 'employee_id', 'email_address', 'phone', 'status','operator_img'
         )
 
         count = Operator.objects.count()
@@ -183,7 +184,7 @@ class Operator_service:
         page_obj = paginator.get_page(page_number)
         for kw in page_obj.object_list:
             data.append({"operator_id": kw["operator_id"], "first_name": kw["first_name"], "last_name": kw["last_name"],"company":kw["company"],
-                         "status": kw["status"],"employee_id":kw["employee_id"],"email_address":kw["email_address"],"phone":kw["phone"]})
+                         "status": kw["status"],"employee_id":kw["employee_id"],"email_address":kw["email_address"],"phone":kw["phone"],"operator_img":kw["operator_img"]})
         payload = {
             "page": {
                 "current": page_obj.number,
@@ -205,6 +206,7 @@ class Operator_service:
         temp_response.set_employee_id(id_obj.employee_id)
         temp_response.set_email_address(id_obj.email_address)
         temp_response.set_phone(id_obj.phone)
+        temp_response.set_operator_img(id_obj.operator_img)
         return temp_response
 
     def modification_operator(self,operator_id,status,Flag):
@@ -358,3 +360,8 @@ class ECAC_service:
                 return success_obj
 
 
+    def download_file(self, operator_img):
+        download_file = Operator.objects.get(operator_img=operator_img)
+        response = HttpResponse(download_file.operator_img, content_type='application/force-download')
+        response['content-Disposition'] = f'attachment;filename = "{download_file.operator_img}"'
+        return response

@@ -77,6 +77,8 @@ class Operator_response:
         self.phone = phone
     def set_status(self, status):
         self.status = status
+    def set_operator_img(self, operator_img):
+        self.operator_img = operator_img
 
 class ECAC_response:
     ecac_id = None
