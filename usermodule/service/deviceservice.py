@@ -362,6 +362,16 @@ class ECAC_service:
 
     def download_file(self, operator_img):
         download_file = Operator.objects.get(operator_img=operator_img)
-        response = HttpResponse(download_file.operator_img, content_type='application/force-download')
-        response['content-Disposition'] = f'attachment;filename = "{download_file.operator_img}"'
+        image_data = download_file.operator_img
+        # encoded_image = base64.b64encode(image_data).decode('utf-8')
+        # with open(download_file.operator_img, 'rb') as file:
+        #     image_data = file.read()
+        #
+        #     # Encode the image data to base64
+        # encoded_image = base64.b64encode(image_data).decode('utf-8')
+
+        # Create a base64 encoded response
+        response = HttpResponse(image_data, content_type='application/force-download')
+        response['Content-Disposition'] = f'attachment; filename="{download_file.operator_img}"'
+
         return response
