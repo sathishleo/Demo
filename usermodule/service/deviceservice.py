@@ -1,3 +1,4 @@
+import base64
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
@@ -360,18 +361,28 @@ class ECAC_service:
                 return success_obj
 
 
+    # def download_file(self, operator_img):
+    #     download_file = Operator.objects.get(operator_img=operator_img)
+    #     image_data = download_file.operator_img
+    #     # encoded_image = base64.b64encode(image_data).decode('utf-8')
+    #     # with open(download_file.operator_img, 'rb') as file:
+    #     #     image_data = file.read()
+    #     #
+    #     #     # Encode the image data to base64
+    #     # encoded_image = base64.b64encode(image_data).decode('utf-8')
+
+    #     # Create a base64 encoded response
+    #     response = HttpResponse(image_data, content_type='application/force-download')
+    #     response['Content-Disposition'] = f'attachment; filename="{download_file.operator_img}"'
+
+    #     return response
+    
     def download_file(self, operator_img):
         download_file = Operator.objects.get(operator_img=operator_img)
-        image_data = download_file.operator_img
-        # encoded_image = base64.b64encode(image_data).decode('utf-8')
-        # with open(download_file.operator_img, 'rb') as file:
-        #     image_data = file.read()
-        #
-        #     # Encode the image data to base64
-        # encoded_image = base64.b64encode(image_data).decode('utf-8')
+        image_data = download_file.operator_img.read()  # Read the image data
 
-        # Create a base64 encoded response
-        response = HttpResponse(image_data, content_type='application/force-download')
-        response['Content-Disposition'] = f'attachment; filename="{download_file.operator_img}"'
+        # Encode the image data to base64
+        encoded_image = base64.b64encode(image_data).decode('utf-8')
 
-        return response
+        # Return the encoded image data as a response
+        return HttpResponse(encoded_image, content_type='text/plain')  # Ensure the correct content type

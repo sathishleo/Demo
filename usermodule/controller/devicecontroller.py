@@ -152,11 +152,11 @@ def operator_search(request):
 # @permission_classes([IsAuthenticated,Permission])
 def download_operator(request):
     if request.method == 'GET':
-        name=request.GET.get("gen_key")
+        name = request.GET.get("gen_key")
         service = ECAC_service()
         resp_obj = service.download_file(name)
         return resp_obj
-
+    
 @csrf_exempt
 @api_view(['POST', 'GET'])
 def ecac_create(request):
