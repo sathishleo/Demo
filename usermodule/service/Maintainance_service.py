@@ -94,17 +94,16 @@ class TimeMaintenance_service:
 class PauseDetails_service:
 
     def create_scanmaintance(self, request_obj):
-        if request_obj.get_id() is  None:
-            PauseDetails_obj = PauseDetails.objects.create(scan_details_id=request_obj.get_scan_details_id(),pause_time=request_obj.get_pause_time(),play_time=request_obj.get_play_time(),remarks=request_obj.get_remarks())
+        if request_obj.get_pause_details_id() is  None:
+            PauseDetails_obj = PauseDetails.objects.create(scan_details_id_id=request_obj.get_scan_details_id_id(),pause_time=request_obj.get_pause_time(),play_time=request_obj.get_play_time())
         else:
-            PauseDetails_obj = PauseDetails.objects.filter(pause_details_id=request_obj.get_pause_details_id()).update(scan_details_id=request_obj.get_scan_details_id(),pause_time=request_obj.get_pause_time(),play_time=request_obj.get_play_time(),remarks=request_obj.get_remarks(),updated_date=now())
+            PauseDetails_obj = PauseDetails.objects.filter(pause_details_id=request_obj.get_pause_details_id()).update(scan_details_id_id=request_obj.get_scan_details_id_id(),pause_time=request_obj.get_pause_time(),play_time=request_obj.get_play_time(),updated_date=now())
             PauseDetails_obj = PauseDetails.objects.filter(pause_details_id=request_obj.get_pause_details_id())
         temp_response = PauseDetails_response()
         temp_response.set_pause_details_id(PauseDetails_obj.pause_details_id)
-        temp_response.set_scan_details_id(PauseDetails_obj.scan_details_id)
+        temp_response.set_scan_details_id(PauseDetails_obj.scan_details_id_id)
         temp_response.set_play_time(str(PauseDetails_obj.play_time))
         temp_response.set_pause_time(str(PauseDetails_obj.pause_time))
-        temp_response.set_remarks(PauseDetails_obj.remarks)
         temp_response.set_status(PauseDetails_obj.status)
         return temp_response
 
@@ -125,10 +124,9 @@ class PauseDetails_service:
                 for i in obj:
                     temp_response = PauseDetails_response()
                     temp_response.set_pause_details_id(i.pause_details_id)
-                    temp_response.set_scan_details_id(i.scan_details_id)
+                    temp_response.set_scan_details_id(i.scan_details_id_id)
                     temp_response.set_play_time(str(i.play_time))
                     temp_response.set_pause_time(str(i.pause_time))
-                    temp_response.set_remarks(i.remarks)
                     temp_response.set_status(i.status)
                     pro_list.append(temp_response)
                 vpage = DemoPaginator(obj, vys_page.get_index(), 10)
@@ -145,10 +143,9 @@ class PauseDetails_service:
         id_obj = PauseDetails.objects.get(pause_details_id=pause_details_id)
         temp_response = PauseDetails_response()
         temp_response.set_pause_details_id(id_obj.pause_details_id)
-        temp_response.set_scan_details_id(id_obj.scan_details_id)
+        temp_response.set_scan_details_id(id_obj.scan_details_id_id)
         temp_response.set_play_time(str(id_obj.play_time))
         temp_response.set_pause_time(str(id_obj.pause_time))
-        temp_response.set_remarks(id_obj.remarks)
         temp_response.set_status(id_obj.status)
         return temp_response
 

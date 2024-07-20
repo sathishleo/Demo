@@ -206,7 +206,8 @@ class Operator_service:
         temp_response.set_employee_id(id_obj.employee_id)
         temp_response.set_email_address(id_obj.email_address)
         temp_response.set_phone(id_obj.phone)
-        temp_response.set_operator_img(id_obj.operator_img)
+        temp_response.set_operator_img(str(id_obj.operator_img))
+
         return temp_response
 
     def modification_operator(self,operator_id,status,Flag):
@@ -361,17 +362,12 @@ class ECAC_service:
 
 
     def download_file(self, operator_img):
+
         download_file = Operator.objects.get(operator_img=operator_img)
-        image_data = download_file.operator_img
-        # encoded_image = base64.b64encode(image_data).decode('utf-8')
-        # with open(download_file.operator_img, 'rb') as file:
-        #     image_data = file.read()
-        #
-        #     # Encode the image data to base64
-        # encoded_image = base64.b64encode(image_data).decode('utf-8')
+        image_data = download_file.operator_img.read()  # Read the image data
 
-        # Create a base64 encoded response
-        response = HttpResponse(image_data, content_type='application/force-download')
-        response['Content-Disposition'] = f'attachment; filename="{download_file.operator_img}"'
+        # Encode the image data to base64
+        encoded_image = base64.b64encode(image_data).decode('utf-8')
 
-        return response
+        # Return the encoded image data as a response
+        return HttpResponse(encoded_image, content_type='text/plain')  # Ensure the correct content type

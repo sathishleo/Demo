@@ -71,18 +71,19 @@ class PauseDetails_request:
     remarks = None
 
     def __init__(self, object):
-        if 'pause_details_id' in object:
-            self.pause_details_id = object["pause_details_id"]
-        if 'scan_details_id' in object:
-            self.scan_details_id = object["scan_details_id"]
-        if 'pause_time' in object:
-            self.pause_time = object["pause_time"]
-        if 'play_time' in object:
-            self.play_time = object["play_time"]
-        if 'remark' in object:
-            self.remark = object["remark"]
+     for i in object:
+        if 'pause_details_id' in i:
+            self.pause_details_id = i["pause_details_id"]
+        if 'scan_details_id' in i:
+            self.scan_details_id = i["scan_details_id"]
+        if 'pause_time' in i:
+            self.pause_time = i["pause_time"]
+        if 'play_time' in i:
+            self.play_time = i["play_time"]
+        if 'remark' in i:
+            self.remark = i["remark"]
 
-    def get_scan_details_id(self):
+    def get_scan_details_id_id(self):
         return self.scan_details_id
 
     def get_pause_details_id(self):
