@@ -119,6 +119,28 @@ CORS_ALLOWED_ORIGINS = [
 # Or use this to allow all origins (development only)
 CORS_ALLOW_ALL_ORIGINS = True
 
+# Allow credentials (if needed)
+CORS_ALLOW_CREDENTIALS = True
+
+# Additional CORS settings (if needed)
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'authorization',
+    'content-type',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
