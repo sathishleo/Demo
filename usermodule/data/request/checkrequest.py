@@ -4,6 +4,7 @@ class ControlSheet_request:
     control_operator_id =None
     check_date = None
     remark = None
+    signature=None
 
     def __init__(self, object):
         if 'control_sheet_id' in object:
@@ -16,6 +17,8 @@ class ControlSheet_request:
             self.remark = object["remark"]
         if 'control_operator_id' in object:
             self.control_operator_id = object["control_operator_id"]
+        if 'signature' in object:
+            self.signature = object["signature"]
 
     def get_control_sheet_id(self):
         return self.control_sheet_id
@@ -30,6 +33,9 @@ class ControlSheet_request:
         return self.remark
     def get_control_operator_id(self):
         return self.control_operator_id
+
+    def get_signature(self):
+        return self.signature
 
 class CheckRule_request:
     checkrule_id=None

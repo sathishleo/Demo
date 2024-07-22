@@ -20,14 +20,15 @@ class Controll_service:
 
     def create_Controll(self, request_obj):
         if request_obj.get_control_sheet_id() is  None:
-            Controll_obj = ControlSheet.objects.create(device_id=request_obj.get_device_id(),control_operator_id=request_obj.get_control_operator_id(),check_date=request_obj.get_check_date())
+            Controll_obj = ControlSheet.objects.create(device_id=request_obj.get_device_id(),control_operator_id=request_obj.get_control_operator_id(),check_date=request_obj.get_check_date(),signature=request_obj.get_signature())
         else:
-            Controll_obj = ControlSheet.objects.filter(control_sheet_id=request_obj.get_control_sheet_id()).update(device_id=request_obj.get_device_id(),control_operator_id=request_obj.get_control_operator_id(),check_date=request_obj.get_check_date())
+            Controll_obj = ControlSheet.objects.filter(control_sheet_id=request_obj.get_control_sheet_id()).update(device_id=request_obj.get_device_id(),control_operator_id=request_obj.get_control_operator_id(),check_date=request_obj.get_check_date(),signature=request_obj.get_signature())
             Controll_obj = ControlSheet.objects.get(control_sheet_id=request_obj.get_control_sheet_id())
         temp_response = ControlSheet_response()
         temp_response.set_device_id(Controll_obj.device_id)
         temp_response.set_control_operator_id(Controll_obj.control_operator.operator_id)
         temp_response.set_control_sheet_id(Controll_obj.control_sheet_id)
+        temp_response.set_signature(Controll_obj.signature)
         check_date_datetime = datetime.datetime.strptime(Controll_obj.check_date, "%Y-%m-%d %H:%M:%S")
         time_str = check_date_datetime.strftime("%H:%M:%S")
         temp_response.check_time=str(time_str)
@@ -63,7 +64,7 @@ class Controll_service:
 
 
         keywords = ControlSheet.objects.filter(condition).values('device_id', 'control_sheet_id', 'control_operator_id',
-                                                                 'check_date', 'status')
+                                                                 'check_date', 'status','signature')
 
         count = ControlSheet.objects.count()
         paginator = Paginator(keywords, per_page)
@@ -75,7 +76,7 @@ class Controll_service:
 
             data.append({"device_id": kw["device_id"], "control_sheet_id": kw["control_sheet_id"], "control_operator_id": kw["control_operator_id"],
                          "check_date": str(kw["check_date"]),"check_time":time_str,
-                         "status": kw["status"]})
+                         "status": kw["status"],"signature": kw["signature"]})
         payload = {
             "page": {
                 "current": page_obj.number,
@@ -125,6 +126,7 @@ class Controll_service:
         time_str = check_date_datetime.strftime("%H:%M:%S")
         temp_response.set_device_id(id_obj.device_id)
         temp_response.check_time = str(time_str)
+        temp_response.set_signature(id_obj.signature)
         temp_response.set_control_operator_id(id_obj.control_operator.operator_id)
         temp_response.set_control_sheet_id(id_obj.control_sheet_id)
         temp_response.set_check_date(str(id_obj.check_date))

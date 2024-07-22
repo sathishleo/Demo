@@ -9,6 +9,8 @@ class ControlSheet_response:
     check_date = None
     remark = None
     status=None
+    signature=None
+
 
     def get(self):
         return json.dumps(self, default=lambda o: o.__dict__,
@@ -33,6 +35,10 @@ class ControlSheet_response:
         self.remark = remark
     def set_status(self, status):
         self.status = status
+
+
+    def set_signature(self, signature):
+        self.signature = signature
 
 class CheckRule_response:
     checkrule_id=None
