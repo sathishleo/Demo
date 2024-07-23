@@ -81,6 +81,8 @@ class ShiftDetail_response:
         self.status = status
     def set_supervisor(self, supervisor):
         self.supervisor = supervisor
+    def set_supervisor_signature(self, supervisor_signature):
+        self.supervisor_signature = supervisor_signature
 
 class DropDown_response:
     drop_down_id=None

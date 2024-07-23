@@ -492,9 +492,9 @@ class shiftdetails_service:
 
     def create_shiftdetails(self, request_obj):
         if request_obj.get_shift_details_id() is  None:
-            ShiftDetails_obj = ShiftDetails.objects.create(shift_date=request_obj.get_shift_date(),start_time=request_obj.get_start_time(),end_time=request_obj.get_end_time(),scan_count=request_obj.get_scan_count(),supervisor=request_obj.get_supervisor(),remark=request_obj.get_remark())
+            ShiftDetails_obj = ShiftDetails.objects.create(shift_date=request_obj.get_shift_date(),start_time=request_obj.get_start_time(),end_time=request_obj.get_end_time(),scan_count=request_obj.get_scan_count(),supervisor=request_obj.get_supervisor(),remark=request_obj.get_remark(),supervisor_signature=request_obj.get_supervisor_signature())
         else:
-            ShiftDetails_obj = ShiftDetails.objects.filter(shift_details_id=request_obj.get_shift_details_id()).update(shift_date=request_obj.get_shift_date(),start_time=request_obj.get_start_time(),end_time=request_obj.get_end_time(),scan_count=request_obj.get_scan_count(),supervisor=request_obj.get_supervisor(),remark=request_obj.get_remark(),updated_date=now())
+            ShiftDetails_obj = ShiftDetails.objects.filter(shift_details_id=request_obj.get_shift_details_id()).update(shift_date=request_obj.get_shift_date(),start_time=request_obj.get_start_time(),end_time=request_obj.get_end_time(),scan_count=request_obj.get_scan_count(),supervisor=request_obj.get_supervisor(),remark=request_obj.get_remark(),supervisor_signature=request_obj.get_supervisor_signature())
             ShiftDetails_obj = ShiftDetails.objects.get(shift_details_id=request_obj.get_shift_details_id())
         temp_response = ShiftDetail_response()
         temp_response.set_shift_details_id(ShiftDetails_obj.shift_details_id)
@@ -504,6 +504,7 @@ class shiftdetails_service:
         temp_response.set_scan_count(ShiftDetails_obj.scan_count)
         temp_response.set_supervisor(ShiftDetails_obj.supervisor)
         temp_response.set_remark(ShiftDetails_obj.remark)
+        temp_response.set_supervisor_signature(ShiftDetails_obj.supervisor_signature)
         temp_response.set_status(ShiftDetails_obj.status)
         return temp_response
 
@@ -511,14 +512,14 @@ class shiftdetails_service:
         condition = Q()
         if supervisor != None and supervisor != "":
             condition &= Q(supervisor=supervisor)
-        keywords = ShiftDetails.objects.filter(condition).values('shift_details_id', 'shift_date', 'start_time', 'end_time','scan_count','supervisor','remark','status')
+        keywords = ShiftDetails.objects.filter(condition).values('shift_details_id', 'shift_date', 'start_time', 'end_time','scan_count','supervisor','remark','status','supervisor_signature')
         count = ShiftDetails.objects.count()
         paginator = Paginator(keywords, per_page)
         data = []
         page_obj = paginator.get_page(page_number)
         for kw in page_obj.object_list:
             data.append({"shift_details_id": kw["shift_details_id"], "shift_date": kw["shift_date"], "start_time": kw["start_time"],"end_time":kw["end_time"],
-                         "status": kw["status"],"scan_count":kw["scan_count"],"supervisor":kw["supervisor"],"remark":kw["remark"]})
+                         "status": kw["status"],"scan_count":kw["scan_count"],"supervisor":kw["supervisor"],"remark":kw["remark"],"supervisor_signature":kw["supervisor_signature"]})
         payload = {
             "page": {
                 "current": page_obj.number,
@@ -541,6 +542,7 @@ class shiftdetails_service:
         temp_response.set_supervisor(id_obj.supervisor)
         temp_response.set_remark(id_obj.remark)
         temp_response.set_status(id_obj.status)
+        temp_response.set_supervisor_signature(id_obj.supervisor_signature)
         return temp_response
 
     def modification_shiftdetails(self, shift_details_id, status,Flag):

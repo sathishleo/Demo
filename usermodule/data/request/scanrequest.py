@@ -89,6 +89,8 @@ class ShiftDetail_request:
             self.scan_count = object["scan_count"]
         if 'remark' in object:
             self.remark = object["remark"]
+        if 'supervisor_signature' in object:
+            self.supervisor_signature = object["supervisor_signature"]
 
     def get_shift_details_id(self):
         return self.shift_details_id
@@ -108,11 +110,14 @@ class ShiftDetail_request:
 
     def get_remark(self):
         return self.remark
+
     def get_scan_count(self):
         return self.scan_count
 
 
     def get_shift_date(self):
+        return self.shift_date
+    def get_supervisor_signature(self):
         return self.shift_date
 
 class DropDown_request:
