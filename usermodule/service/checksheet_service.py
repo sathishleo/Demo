@@ -64,7 +64,7 @@ class Controll_service:
 
 
         keywords = ControlSheet.objects.filter(condition).values('device_id', 'control_sheet_id', 'control_operator_id',
-                                                                 'check_date', 'status','signature')
+                                                                 'check_date', 'status','signature').order_by("-created_date")
 
         count = ControlSheet.objects.count()
         paginator = Paginator(keywords, per_page)

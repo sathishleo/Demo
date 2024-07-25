@@ -91,13 +91,21 @@ def view_device(request, device_id):
 def operator_create(request):
     if request.method == 'POST':
         operator_data = json.loads(request.data.dict().get('data'))
-        file = request.FILES["file"]
+        operator_obj = Operator_request(operator_data)
+        file = request.FILES.get('file')
+        if file:
+            file_obj=file
+            opera_service = Operator_service()
+            resp_obj = opera_service.create_operator(operator_obj, file_obj)
+        else:
         # user_id = request.user.id
         # emp_service = Emp_service()
         # emp_id = emp_service.get_empid_from_userid(user_id)
-        operator_obj = Operator_request(operator_data)
-        opera_service = Operator_service()
-        resp_obj = opera_service.create_operator(operator_obj,file)
+            operator_obj = Operator_request(operator_data)
+            opera_service = Operator_service()
+            resp_obj = opera_service.create_operator(operator_obj,None)
+
+
         response = HttpResponse(resp_obj.get(), content_type="application/json")
         return response
 

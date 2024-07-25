@@ -11,7 +11,8 @@ from utlis.dataservice.demo_paginator import DemoPaginator
 from utlis.dataservice.error import Error
 from utlis.dataservice.success import Success, SuccessMessage, SuccessStatus
 
-
+from django.core.files.storage import FileSystemStorage
+from django.utils.timezone import now
 class deviceservice:
 
 
@@ -125,13 +126,36 @@ class deviceservice:
 
 
 class Operator_service:
+    # from django.utils.timezone import now
+    # from .models import Operator
 
-    def create_operator(self, request_obj,file):
-        if request_obj.get_operator_id() is  None:
-            operator_obj = Operator.objects.create(first_name=request_obj.get_first_name(),last_name=request_obj.get_last_name(),company=request_obj.get_company(),employee_id=request_obj.get_employee_id(),email_address=request_obj.get_email_address(),phone=request_obj.get_phone(),operator_img=file)
+    def create_operator(self, request_obj, file=None):
+        if request_obj.get_operator_id() is None:
+            operator_obj = Operator.objects.create(
+                first_name=request_obj.get_first_name(),
+                last_name=request_obj.get_last_name(),
+                company=request_obj.get_company(),
+                employee_id=request_obj.get_employee_id(),
+                email_address=request_obj.get_email_address(),
+                phone=request_obj.get_phone()
+            )
+            if file:
+                operator_obj.operator_img = file
+                operator_obj.save()
         else:
-            operator_obj = Operator.objects.filter(operator_id=request_obj.get_operator_id()).update(first_name=request_obj.get_first_name(),last_name=request_obj.get_last_name(),company=request_obj.get_company(),employee_id=request_obj.get_employee_id(),email_address=request_obj.get_email_address(),phone=request_obj.get_phone(),updated_date=now())
             operator_obj = Operator.objects.get(operator_id=request_obj.get_operator_id())
+            operator_obj.first_name = request_obj.get_first_name()
+            operator_obj.last_name = request_obj.get_last_name()
+            operator_obj.company = request_obj.get_company()
+            operator_obj.employee_id = request_obj.get_employee_id()
+            operator_obj.email_address = request_obj.get_email_address()
+            operator_obj.phone = request_obj.get_phone()
+            operator_obj.updated_date = now()
+
+            if file:
+                operator_obj.operator_img = file
+            operator_obj.save()
+
         temp_response = Operator_response()
         temp_response.set_operator_id(operator_obj.operator_id)
         temp_response.set_first_name(operator_obj.first_name)
@@ -142,6 +166,31 @@ class Operator_service:
         temp_response.set_phone(operator_obj.phone)
         temp_response.set_operator_img(str(operator_obj.operator_img))
         return temp_response
+
+    # def create_operator(self, request_obj,file):
+    #     if request_obj.get_operator_id() is  None:
+    #         operator_obj = Operator.objects.create(first_name=request_obj.get_first_name(),last_name=request_obj.get_last_name(),company=request_obj.get_company(),employee_id=request_obj.get_employee_id(),email_address=request_obj.get_email_address(),phone=request_obj.get_phone())
+    #
+    #         if file:
+    #             operator_obj.operator_img=file
+    #             operator_obj.save()
+    #     else:
+    #         operator_obj = Operator.objects.filter(operator_id=request_obj.get_operator_id()).update(first_name=request_obj.get_first_name(),last_name=request_obj.get_last_name(),company=request_obj.get_company(),employee_id=request_obj.get_employee_id(),email_address=request_obj.get_email_address(),phone=request_obj.get_phone(),updated_date=now())
+    #         if file:
+    #             operator_obj = Operator.objects.filter(operator_id=request_obj.get_operator_id()).update(
+    #                 operator_img=file)
+    #         operator_obj = Operator.objects.get(operator_id=request_obj.get_operator_id())
+    #
+    #     temp_response = Operator_response()
+    #     temp_response.set_operator_id(operator_obj.operator_id)
+    #     temp_response.set_first_name(operator_obj.first_name)
+    #     temp_response.set_last_name(operator_obj.last_name)
+    #     temp_response.set_company(operator_obj.company)
+    #     temp_response.set_employee_id(operator_obj.employee_id)
+    #     temp_response.set_email_address(operator_obj.email_address)
+    #     temp_response.set_phone(operator_obj.phone)
+    #     temp_response.set_operator_img(str(operator_obj.operator_img))
+    #     return temp_response
 
     def fetch_operator(self, page_number, per_page, first_name,query_text,operator_id,last_name,company,employee_id,email_address,phone):
 
@@ -299,7 +348,7 @@ class ECAC_service:
         keywords = ECAC.objects.filter(condition).values(
             'operator_id', 'device_id', 'ecac_id', 'position', 'test_date', 'test_time', 'test_view', 'status',
             'test_1test_2', 'test_3', 'test_4a', 'test_4b', 'test_5'
-        )
+        ).order_by("-created_date")
 
         # Count total items before pagination
         total_count = keywords.count()
