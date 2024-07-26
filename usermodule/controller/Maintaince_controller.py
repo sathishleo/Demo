@@ -71,13 +71,16 @@ def view_shiftmaintaince(request, time_maintenance_id):
 # @permission_classes([IsAuthenticated,Permission])
 def create_PauseDetails(request):
     if request.method == 'POST':
+        request_obj=None
         # user_id = request.user.id
         # emp_service = Emp_service()
         # emp_id = emp_service.get_empid_from_userid(user_id)
         PauseDetails_data = json.loads(request.body)
+        if isinstance(PauseDetails_data, list) and all(isinstance(item, dict) for item in PauseDetails_data):
+            request_obj = PauseDetails_data
         PauseDetails_obj = PauseDetails_request(PauseDetails_data)
         service = PauseDetails_service()
-        resp_obj = service.create_scanmaintance(PauseDetails_obj)
+        resp_obj = service.create_scanmaintance(request_obj)
         response = HttpResponse(resp_obj.get(), content_type="application/json")
         return response
 

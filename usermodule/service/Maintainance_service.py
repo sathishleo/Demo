@@ -94,18 +94,27 @@ class TimeMaintenance_service:
 class PauseDetails_service:
 
     def create_scanmaintance(self, request_obj):
-        if request_obj.get_pause_details_id() is  None:
-            PauseDetails_obj = PauseDetails.objects.create(scan_details_id_id=request_obj.get_scan_details_id_id(),pause_time=request_obj.get_pause_time(),play_time=request_obj.get_play_time())
-        else:
-            PauseDetails_obj = PauseDetails.objects.filter(pause_details_id=request_obj.get_pause_details_id()).update(scan_details_id_id=request_obj.get_scan_details_id_id(),pause_time=request_obj.get_pause_time(),play_time=request_obj.get_play_time(),updated_date=now())
-            PauseDetails_obj = PauseDetails.objects.filter(pause_details_id=request_obj.get_pause_details_id())
-        temp_response = PauseDetails_response()
-        temp_response.set_pause_details_id(PauseDetails_obj.pause_details_id)
-        temp_response.set_scan_details_id(PauseDetails_obj.scan_details_id_id)
-        temp_response.set_play_time(str(PauseDetails_obj.play_time))
-        temp_response.set_pause_time(str(PauseDetails_obj.pause_time))
-        temp_response.set_status(PauseDetails_obj.status)
-        return temp_response
+        object_list=None
+        for i  in request_obj:
+
+            if i not in ["pause_details_id"]:
+                PauseDetails_obj = PauseDetails.objects.create(scan_details_id_id=i["scan_details_id"],pause_time=i["pause_time"],play_time=i["play_time"])
+            else:
+                PauseDetails_obj = PauseDetails.objects.filter(pause_details_id=i["pause_details_id"]).update(scan_details_id_id=i["scan_details_id"],pause_time=i["pause_time"],play_time=i["play_time"],updated_date=now())
+                PauseDetails_obj = PauseDetails.objects.filter(pause_details_id=i["pause_details_id"])
+            object_list=PauseDetails.objects.filter(scan_details_id_id=i["scan_details_id"])
+        LIST_OBJ=Demo_List()
+        # temp_response = PauseDetails_response()
+        for i in object_list:
+            temp_response = PauseDetails_response()
+            temp_response.set_pause_details_id(i.pause_details_id)
+            temp_response.set_scan_details_id(i.scan_details_id_id)
+            temp_response.set_play_time(str(i.play_time))
+            temp_response.set_pause_time(str(i.pause_time))
+            temp_response.set_status(i.status)
+            LIST_OBJ.append(temp_response)
+        return LIST_OBJ
+
 
     def fetch_scanmaintainance(self, vys_page, scan_details_id):
         try:

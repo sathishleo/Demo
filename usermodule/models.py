@@ -72,6 +72,7 @@ class ControlSheet(models.Model):
     device = models.ForeignKey(Device, on_delete=models.DO_NOTHING)
     control_operator = models.ForeignKey(Operator, on_delete=models.DO_NOTHING)
     check_date = models.DateTimeField()
+    check_time=models.TimeField(null=True)
     signature = models.TextField(null=True)
     status = models.IntegerField(default=1)
     created_by = models.IntegerField(null=True)
