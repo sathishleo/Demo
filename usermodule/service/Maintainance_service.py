@@ -116,37 +116,68 @@ class PauseDetails_service:
         return LIST_OBJ
 
 
-    def fetch_scanmaintainance(self, vys_page, scan_details_id):
-        try:
-            condition = Q(status=1)
-            if scan_details_id != " " and scan_details_id != None:
+    def fetch_scanmaintainance(self, page_number,per_page,scan_details_id):
+        if scan_details_id != None and scan_details_id != "":
+            keywords = PauseDetails.objects.filter(
+                Q(scan_details_id=scan_details_id)
+            ).values('pause_details_id', 'scan_details_id_id','play_time', 'pause_time',
+                                                                        'status')
+        else:
+            condition = Q()
+            if scan_details_id != None and scan_details_id != "":
                 condition &= Q(scan_details_id=scan_details_id)
-            obj = PauseDetails.objects.filter(condition)[
-                  vys_page.get_offset():vys_page.get_query_limit()]
-
-            list_length = len(obj)
-            pro_list = Demo_List()
-            if list_length <= 0:
-                return pro_list
-            else:
-
-                for i in obj:
-                    temp_response = PauseDetails_response()
-                    temp_response.set_pause_details_id(i.pause_details_id)
-                    temp_response.set_scan_details_id(i.scan_details_id_id)
-                    temp_response.set_play_time(str(i.play_time))
-                    temp_response.set_pause_time(str(i.pause_time))
-                    temp_response.set_status(i.status)
-                    pro_list.append(temp_response)
-                vpage = DemoPaginator(obj, vys_page.get_index(), 10)
-                pro_list.set_pagination(vpage)
-                return pro_list
-        except Exception as e:
-            error_obj = Error()
-            print(e)
-            # error_obj.set_code(ErrorMessage.INVALID_DATA)
-            error_obj.set_description(str(e))
-            return error_obj
+            keywords = PauseDetails.objects.filter(condition).values('pause_details_id', 'scan_details_id_id',
+                                                                        'play_time', 'pause_time',
+                                                                        'status')
+        count = PauseDetails.objects.count()
+        paginator = Paginator(keywords, per_page)
+        data = []
+        page_obj = paginator.get_page(page_number)
+        for kw in page_obj.object_list:
+            data.append({"pause_details_id": kw["pause_details_id"], "scan_details_id_id": kw["scan_details_id_id"],
+                         "play_time": str(kw["play_time"]),
+                         "pause_time": str(kw["pause_time"]),
+                         "status": kw["status"]})
+        payload = {
+            "page": {
+                "current": page_obj.number,
+                "has_next": page_obj.has_next(),
+                "has_previous": page_obj.has_previous(),
+                "count": count
+            },
+            "data": data
+        }
+        return JsonResponse(payload)
+        # try:
+        #     condition = Q(status=1)
+        #     if scan_details_id != " " and scan_details_id != None:
+        #         condition &= Q(scan_details_id=scan_details_id)
+        #     obj = PauseDetails.objects.filter(condition)[
+        #           vys_page.get_offset():vys_page.get_query_limit()]
+        #
+        #     list_length = len(obj)
+        #     pro_list = Demo_List()
+        #     if list_length <= 0:
+        #         return pro_list
+        #     else:
+        #
+        #         for i in obj:
+        #             temp_response = PauseDetails_response()
+        #             temp_response.set_pause_details_id(i.pause_details_id)
+        #             temp_response.set_scan_details_id(i.scan_details_id_id)
+        #             temp_response.set_play_time(str(i.play_time))
+        #             temp_response.set_pause_time(str(i.pause_time))
+        #             temp_response.set_status(i.status)
+        #             pro_list.append(temp_response)
+        #         vpage = DemoPaginator(obj, vys_page.get_index(), 10)
+        #         pro_list.set_pagination(vpage)
+        #         return pro_list
+        # except Exception as e:
+        #     error_obj = Error()
+        #     print(e)
+        #     # error_obj.set_code(ErrorMessage.INVALID_DATA)
+        #     error_obj.set_description(str(e))
+        #     return error_obj
 
     def scanmaintainance_get(self, pause_details_id):
         id_obj = PauseDetails.objects.get(pause_details_id=pause_details_id)

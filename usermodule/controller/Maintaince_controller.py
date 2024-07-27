@@ -85,14 +85,13 @@ def create_PauseDetails(request):
         return response
 
     if request.method == 'GET':
-        page = request.GET.get('page', 1)
-        page = int(page)
+        page_number = request.GET.get('page', 1)
+        per_page = request.GET.get('limit', 10)
         scan_details_id = request.GET.get('scan_details_id')
-        vys_page = Page_view(page, 10)
         service = PauseDetails_service()
-        resp_obj = service.fetch_scanmaintainance(vys_page, scan_details_id)
-        response = HttpResponse(resp_obj.get(), content_type="application/json")
-        return response
+        resp_obj = service.fetch_scanmaintainance(page_number,per_page,scan_details_id)
+
+        return resp_obj
 
 
 @csrf_exempt
