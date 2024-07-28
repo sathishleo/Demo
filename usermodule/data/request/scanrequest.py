@@ -118,7 +118,7 @@ class ShiftDetail_request:
     def get_shift_date(self):
         return self.shift_date
     def get_supervisor_signature(self):
-        return self.shift_date
+        return self.supervisor_signature
 
 class DropDown_request:
     drop_down_id=None
