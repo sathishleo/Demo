@@ -58,7 +58,7 @@ class Controll_service:
             if start_date is not None and start_date != "" and end_date is not None and end_date != "":
                 condition &= Q(check_date__range=[start_date, end_date])
             elif start_date is not None and start_date != "":
-                condition &= Q(check_date__icontains=start_date)
+                condition &= Q(check_date=start_date)
             elif start_time != None and start_time != "":
                 condition &= Q(check_time__gte=start_time)
             elif end_time != None and end_time != "":
