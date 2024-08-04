@@ -572,17 +572,36 @@ class shiftdetails_service:
 class dropdown_service:
 
     def create_dropdown(self, request_obj):
-        if request_obj.get_drop_down_id() is  None:
-            DropDown_obj = DropDown.objects.create(list_item=request_obj.get_list_item(),list_type=request_obj.get_list_type())
+        drop_down_validation=self.validation_records(request_obj)
+        if drop_down_validation==True:
+
+            if request_obj.get_drop_down_id() is  None:
+                DropDown_obj = DropDown.objects.create(list_item=request_obj.get_list_item(),list_type=request_obj.get_list_type())
+            else:
+                DropDown_obj = DropDown.objects.filter(drop_down_id=request_obj.get_drop_down_id()).update(list_item=request_obj.get_list_item(),list_type=request_obj.get_list_type())
+                DropDown_obj = DropDown.objects.get(drop_down_id=request_obj.get_drop_down_id())
+            temp_response = DropDown_response()
+            temp_response.set_drop_down_id(DropDown_obj.drop_down_id)
+            temp_response.set_list_item(DropDown_obj.list_item)
+            temp_response.set_list_type(DropDown_obj.list_type)
+            temp_response.set_status(DropDown_obj.status)
+            return temp_response
         else:
-            DropDown_obj = DropDown.objects.filter(drop_down_id=request_obj.get_drop_down_id()).update(list_item=request_obj.get_list_item(),list_type=request_obj.get_list_type())
-            DropDown_obj = DropDown.objects.get(drop_down_id=request_obj.get_drop_down_id())
-        temp_response = DropDown_response()
-        temp_response.set_drop_down_id(DropDown_obj.drop_down_id)
-        temp_response.set_list_item(DropDown_obj.list_item)
-        temp_response.set_list_type(DropDown_obj.list_type)
-        temp_response.set_status(DropDown_obj.status)
-        return temp_response
+            error = Error()
+            error.set_status(400)
+            error.set_description("Drop down list item duplicate")
+            return error.to_response()
+
+
+    def validation_records(self,request_obj):
+        DropDown_obj = DropDown.objects.filter(list_item=request_obj.get_list_item(),
+                                               list_type=request_obj.get_list_type())
+        if len(DropDown_obj)>0:
+            key=False
+        else:
+            key=True
+        return key
+
 
     # def fetch_dropdown(self, vys_page, list_type,limit):
     #     try:
