@@ -83,11 +83,11 @@ WSGI_APPLICATION = 'Demo.wsgi.application'
 DATABASES = {
     'default': {
                 'ENGINE': 'django.db.backends.mysql',
-                'NAME': 'your_database_name',
-                'USER': 'your_user',
-                'PASSWORD':'your_password',
+                'NAME': 'xray-app',
+                'USER': 'root',
+                'PASSWORD':'toor',
                 'PORT': '3306',
-                'HOST': 'localhost'
+                'HOST': '127.0.0.1'
     }
 }
 
