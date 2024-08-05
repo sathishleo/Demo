@@ -79,15 +79,25 @@ WSGI_APPLICATION = 'Demo.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
+DB_NAME = env.str('DB_NAME')
+# DATABASES = {
+#     'default': {
+#                 'ENGINE': 'django.db.backends.mysql',
+#                 'NAME': 'xray-app',
+#                 'USER': 'root',
+#                 'PASSWORD':'toor',
+#                 'PORT': '3306',
+#                 'HOST': '127.0.0.1'
+#     }
+# }
 DATABASES = {
     'default': {
-                'ENGINE': 'django.db.backends.mysql',
-                'NAME': 'xray-app',
-                'USER': 'root',
-                'PASSWORD':'toor',
-                'PORT': '3306',
-                'HOST': '127.0.0.1'
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'your_db_name',
+        'USER': 'your_db_user',
+        'PASSWORD': 'your_db_password',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
     }
 }
 
