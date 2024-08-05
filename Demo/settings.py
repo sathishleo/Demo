@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'Demo.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-DB_NAME = env.str('DB_NAME')
+# DB_NAME = env.str('DB_NAME')
 # DATABASES = {
 #     'default': {
 #                 'ENGINE': 'django.db.backends.mysql',
