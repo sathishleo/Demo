@@ -590,7 +590,7 @@ class dropdown_service:
             error = Error()
             error.set_status(400)
             error.set_description("Drop down list item duplicate")
-            return error.to_response()
+            return error
 
 
     def validation_records(self,request_obj):
