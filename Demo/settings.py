@@ -103,10 +103,10 @@ GRAPH_MODELS ={
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'database-1',
+        'NAME': 'database-2',
         'USER': 'admin',
         'PASSWORD': 'P4ssw0rd!',
-        'HOST': 'database-1.cp02qkug8ip9.ap-south-1.rds.amazonaws.com',
+        'HOST': 'database-2.cp02qkug8ip9.ap-south-1.rds.amazonaws.com',
         'PORT': '3306',
     }
 }
