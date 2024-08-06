@@ -10,9 +10,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='controlsheet',
-            name='check_time',
-            field=models.TimeField(null=True),
-        ),
+        # migrations.AddField(
+        #     model_name='controlsheet',
+        #     name='check_time',
+        #     field=models.TimeField(null=True),
+        # ),
     ]
