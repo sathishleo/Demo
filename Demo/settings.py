@@ -180,7 +180,7 @@ ALLOWED_HOSTS = ['3.108.224.21']
 
 # CORS settings (if needed)
 CORS_ALLOWED_ORIGINS = [
-    "https://xraydoc.netlify.app/api/",
+    "https://xraydoc.netlify.app/api",
 ]
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
