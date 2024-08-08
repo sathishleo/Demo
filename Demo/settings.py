@@ -128,11 +128,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # React app URL
-    "http://localhost:5173",  # React app URL
-    "http://localhost:5174",  # React app URL
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",  # React app URL
+#     "http://localhost:5173",  # React app URL
+#     "http://localhost:5174",  # React app URL
+# ]
 
 # Or use this to allow all origins (development only)
 CORS_ALLOW_ALL_ORIGINS = True
@@ -170,7 +170,18 @@ USE_I18N = True
 
 USE_TZ = True
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
+# Allowed hosts
+ALLOWED_HOSTS = ['3.108.224.21']
+
+# CORS settings (if needed)
+CORS_ALLOWED_ORIGINS = [
+    "https://xraydoc.netlify.app/",
+]
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 STATIC_URL = 'static/'
